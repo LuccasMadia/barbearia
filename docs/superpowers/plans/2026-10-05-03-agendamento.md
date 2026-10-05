@@ -52,7 +52,7 @@ barbearia/
 **Interfaces:**
 - Produces: a Postgres exclusion constraint `appointments_no_overlap` that rejects (error code `23P01`) any insert/update creating two `status = 'agendado'` appointments for the same barber with overlapping `[starts_at, ends_at)` ranges. This is the safety net behind the application-level recheck in Task 5.
 
-- [ ] **Step 1: Write the migration**
+- [x] **Step 1: Write the migration**
 
 Create `supabase/migrations/0002_appointments_exclusion.sql`:
 
@@ -68,7 +68,7 @@ alter table appointments
   where (status = 'agendado');
 ```
 
-- [ ] **Step 2: Push the migration**
+- [x] **Step 2: Push the migration**
 
 ```bash
 npx supabase db push
@@ -76,7 +76,7 @@ npx supabase db push
 
 Expected: output lists `0002_appointments_exclusion.sql` as applied with no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add supabase/migrations/0002_appointments_exclusion.sql
@@ -95,13 +95,13 @@ git commit -m "feat: add exclusion constraint preventing overlapping barber appo
 **Interfaces:**
 - Produces: `normalizePhone(raw: string): string` — strips everything but digits. Used by Task 5 to key client lookups/upserts.
 
-- [ ] **Step 1: Install Vitest**
+- [x] **Step 1: Install Vitest**
 
 ```bash
 npm install --save-dev vitest
 ```
 
-- [ ] **Step 2: Add the test script**
+- [x] **Step 2: Add the test script**
 
 In `package.json`, add `"test"` to the `scripts` block (alongside the existing `dev`/`build`/`start`/`lint`):
 
@@ -109,7 +109,7 @@ In `package.json`, add `"test"` to the `scripts` block (alongside the existing `
 "test": "vitest run"
 ```
 
-- [ ] **Step 3: Write the failing tests**
+- [x] **Step 3: Write the failing tests**
 
 Create `lib/phone.test.ts`:
 
@@ -132,7 +132,7 @@ describe("normalizePhone", () => {
 });
 ```
 
-- [ ] **Step 4: Run tests to verify they fail**
+- [x] **Step 4: Run tests to verify they fail**
 
 ```bash
 npx vitest run lib/phone.test.ts
@@ -140,7 +140,7 @@ npx vitest run lib/phone.test.ts
 
 Expected: FAIL with "Cannot find module './phone'" (or similar).
 
-- [ ] **Step 5: Implement**
+- [x] **Step 5: Implement**
 
 Create `lib/phone.ts`:
 
@@ -150,7 +150,7 @@ export function normalizePhone(raw: string): string {
 }
 ```
 
-- [ ] **Step 6: Run tests to verify they pass**
+- [x] **Step 6: Run tests to verify they pass**
 
 ```bash
 npx vitest run lib/phone.test.ts
@@ -158,7 +158,7 @@ npx vitest run lib/phone.test.ts
 
 Expected: PASS (3 tests).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add lib/phone.ts lib/phone.test.ts package.json package-lock.json
@@ -179,7 +179,7 @@ git commit -m "feat: add phone normalization helper"
   - `TimeRange = { startAt: Date; endAt: Date }`.
   - Params: `{ date: Date; serviceDurationMinutes: number; scheduleRules: ScheduleRule[]; timeOff: TimeRange[]; bookedAppointments: TimeRange[]; slotIntervalMinutes?: number (default 15); now?: Date (default `new Date()`) }`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `lib/slots.test.ts`:
 
@@ -287,7 +287,7 @@ describe("getAvailableSlots", () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 npx vitest run lib/slots.test.ts
@@ -295,7 +295,7 @@ npx vitest run lib/slots.test.ts
 
 Expected: FAIL with "Cannot find module './slots'" (or similar).
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `lib/slots.ts`:
 
@@ -376,7 +376,7 @@ function overlaps(startA: Date, endA: Date, startB: Date, endB: Date): boolean {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 npx vitest run lib/slots.test.ts
@@ -384,7 +384,7 @@ npx vitest run lib/slots.test.ts
 
 Expected: PASS (6 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/slots.ts lib/slots.test.ts
@@ -401,7 +401,7 @@ git commit -m "feat: add slot availability calculation with unit tests"
 **Interfaces:**
 - Produces: `getActiveBarbers(): Promise<Tables<'barbers'>[]>` — barbers where `active = true`, ordered by `name`. Safe for anon (Plan 1's `"public read barbers"` RLS policy already allows this); used by `app/agendar/page.tsx` (Task 7) to list barber choices.
 
-- [ ] **Step 1: Add the function**
+- [x] **Step 1: Add the function**
 
 Append to `lib/site-data.ts`:
 
@@ -418,7 +418,7 @@ export async function getActiveBarbers(): Promise<Tables<"barbers">[]> {
 }
 ```
 
-- [ ] **Step 2: Verify it compiles**
+- [x] **Step 2: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -426,7 +426,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add lib/site-data.ts
@@ -447,7 +447,7 @@ git commit -m "feat: add getActiveBarbers to public site data layer"
   - `CreateAppointmentResult = { success: true; summary: { serviceName: string; barberName: string; startsAt: string } } | { success: false; error: string }`
   - `createAppointment(input: { serviceId: string; barberId: string; startsAtIso: string; name: string; phone: string }): Promise<CreateAppointmentResult>` — revalidates availability server-side (including resolving `"any"` to one specific, still-free barber), upserts the client by normalized phone, inserts the appointment, and returns a summary for the confirmation screen. Note: this calls the same day-wide slot computation as `getAvailableSlots` once per candidate barber to verify the chosen instant is still free — acceptable cost for a small barbershop's appointment volume, and it guarantees the check uses the exact same logic as what the client saw.
 
-- [ ] **Step 1: Write the Server Actions file**
+- [x] **Step 1: Write the Server Actions file**
 
 Create `app/agendar/actions.ts`:
 
@@ -662,7 +662,7 @@ export async function createAppointment(input: {
 }
 ```
 
-- [ ] **Step 2: Verify it compiles**
+- [x] **Step 2: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -670,7 +670,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/agendar/actions.ts
@@ -688,7 +688,7 @@ git commit -m "feat: add booking Server Actions for availability and appointment
 - Consumes: `Tables<'services'>[]`, `Tables<'barbers'>[]` as props; `getAvailableSlots`, `createAppointment` from `app/agendar/actions.ts`.
 - Produces: `<BookingWizard services={...} barbers={...} />` — a four-step client-side flow (service → barber → date/time → contact) ending in an inline confirmation screen. Used by `app/agendar/page.tsx` (Task 7).
 
-- [ ] **Step 1: Write the wizard component**
+- [x] **Step 1: Write the wizard component**
 
 Create `components/booking/BookingWizard.tsx`:
 
@@ -918,7 +918,7 @@ export function BookingWizard({
 }
 ```
 
-- [ ] **Step 2: Verify it compiles**
+- [x] **Step 2: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -926,7 +926,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/booking/BookingWizard.tsx
@@ -943,7 +943,7 @@ git commit -m "feat: add booking wizard client component"
 **Interfaces:**
 - Consumes: `getActiveServices`, `getActiveBarbers` from `lib/site-data.ts`; `BookingWizard` from `components/booking/BookingWizard.tsx`.
 
-- [ ] **Step 1: Replace the placeholder page**
+- [x] **Step 1: Replace the placeholder page**
 
 Replace `app/agendar/page.tsx`:
 
@@ -961,7 +961,7 @@ export default async function AgendarPage() {
 }
 ```
 
-- [ ] **Step 2: Verify it compiles and builds**
+- [x] **Step 2: Verify it compiles and builds**
 
 ```bash
 npx tsc --noEmit
@@ -970,7 +970,7 @@ npm run build
 
 Expected: no errors; build output lists `/agendar` as a route (dynamic, since it reads from the database).
 
-- [ ] **Step 3: Manual verification in the browser**
+- [x] **Step 3: Manual verification in the browser**
 
 ```bash
 npm run dev -- --port 3000 &
@@ -978,7 +978,7 @@ npm run dev -- --port 3000 &
 
 Open `http://localhost:3000/agendar` and walk through the full flow using the Plan 1 seed data (service "Corte de Cabelo", barber "Barbeiro Exemplo", Mon–Fri 09:00–18:00): pick the service, pick "Qualquer disponível", pick a weekday date, confirm a slot renders, fill in a test name/phone, submit, and confirm the confirmation screen shows the right service/barber/time. Then check the Supabase dashboard's Table Editor to confirm a row was created in both `clients` and `appointments`. Stop the dev server afterward (`kill %1`).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/agendar/page.tsx
@@ -991,7 +991,7 @@ git commit -m "feat: wire real booking flow into /agendar"
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Run the full unit test suite**
+- [x] **Step 1: Run the full unit test suite**
 
 ```bash
 npx vitest run
@@ -999,7 +999,7 @@ npx vitest run
 
 Expected: all tests pass (`lib/phone.test.ts`, `lib/slots.test.ts`).
 
-- [ ] **Step 2: Run lint, typecheck, and build**
+- [x] **Step 2: Run lint, typecheck, and build**
 
 ```bash
 npm run lint
@@ -1009,7 +1009,7 @@ npm run build
 
 Expected: all three clean.
 
-- [ ] **Step 3: Commit (only if any fixes were needed in Step 1–2)**
+- [x] **Step 3: Commit (only if any fixes were needed in Step 1–2)**
 
 ```bash
 git add -A
