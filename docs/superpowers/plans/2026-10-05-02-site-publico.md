@@ -56,7 +56,7 @@ barbearia/
   - `formatPriceBRL(cents: number): string` — e.g. `4000` → `"R$ 40,00"`.
   - `formatDuration(minutes: number): string` — e.g. `30` → `"30 min"`, `90` → `"1h30"`.
 
-- [ ] **Step 1: Write the formatting helpers**
+- [x] **Step 1: Write the formatting helpers**
 
 Create `lib/format.ts`:
 
@@ -76,7 +76,7 @@ export function formatDuration(minutes: number): string {
 }
 ```
 
-- [ ] **Step 2: Write the data-access helpers**
+- [x] **Step 2: Write the data-access helpers**
 
 Create `lib/site-data.ts`:
 
@@ -122,7 +122,7 @@ export async function getActiveServices(): Promise<Tables<"services">[]> {
 }
 ```
 
-- [ ] **Step 3: Verify it compiles**
+- [x] **Step 3: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -130,7 +130,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add lib/site-data.ts lib/format.ts
@@ -149,7 +149,7 @@ git commit -m "feat: add public site data-access and formatting helpers"
 - Consumes: `Tables<'site_config'>` (passed as a `siteConfig` prop — fetched once in `app/page.tsx` and threaded down, not re-fetched per component).
 - Produces: `<Header siteConfig={...} />`, `<Footer siteConfig={...} />`.
 
-- [ ] **Step 1: Write the header**
+- [x] **Step 1: Write the header**
 
 Create `components/site/Header.tsx`:
 
@@ -174,7 +174,7 @@ export function Header({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
 }
 ```
 
-- [ ] **Step 2: Write the footer**
+- [x] **Step 2: Write the footer**
 
 Create `components/site/Footer.tsx`:
 
@@ -192,7 +192,7 @@ export function Footer({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/site/Header.tsx components/site/Footer.tsx
@@ -210,7 +210,7 @@ git commit -m "feat: add site header and footer components"
 - Consumes: `Tables<'site_config'>` as a `siteConfig` prop.
 - Produces: `<Hero siteConfig={...} />` — headline with the business name, CTA linking to `/agendar`.
 
-- [ ] **Step 1: Write the hero section**
+- [x] **Step 1: Write the hero section**
 
 Create `components/site/Hero.tsx`:
 
@@ -239,7 +239,7 @@ export function Hero({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
 }
 ```
 
-- [ ] **Step 2: Verify it compiles**
+- [x] **Step 2: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -247,7 +247,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/site/Hero.tsx
@@ -265,7 +265,7 @@ git commit -m "feat: add hero section"
 - Consumes: `Tables<'services'>[]` as a `services` prop; `formatPriceBRL`, `formatDuration` from `lib/format.ts`.
 - Produces: `<ServicesSection services={...} />` — list of active services with name, duration, and price. Renders nothing (returns `null`) when the list is empty, so an unconfigured instance doesn't show an awkward empty section.
 
-- [ ] **Step 1: Write the services section**
+- [x] **Step 1: Write the services section**
 
 Create `components/site/ServicesSection.tsx`:
 
@@ -306,7 +306,7 @@ export function ServicesSection({
 }
 ```
 
-- [ ] **Step 2: Verify it compiles**
+- [x] **Step 2: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -314,7 +314,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/site/ServicesSection.tsx
@@ -333,7 +333,7 @@ git commit -m "feat: add services section"
 - Consumes: `Tables<'site_config'>` as a `siteConfig` prop.
 - Produces: `<AboutSection siteConfig={...} />` (about text + opening hours, renders `null` if both are empty), `<ContactSection siteConfig={...} />` (address with embedded Google Maps iframe, phone, whatsapp, instagram — each rendered only if present; renders `null` if all are empty).
 
-- [ ] **Step 1: Write the about section**
+- [x] **Step 1: Write the about section**
 
 Create `components/site/AboutSection.tsx`:
 
@@ -360,7 +360,7 @@ export function AboutSection({
 }
 ```
 
-- [ ] **Step 2: Write the contact/location section**
+- [x] **Step 2: Write the contact/location section**
 
 Create `components/site/ContactSection.tsx`:
 
@@ -404,7 +404,7 @@ export function ContactSection({
 }
 ```
 
-- [ ] **Step 3: Verify it compiles**
+- [x] **Step 3: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -412,7 +412,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add components/site/AboutSection.tsx components/site/ContactSection.tsx
@@ -430,7 +430,7 @@ git commit -m "feat: add about and contact/location sections"
 - Consumes: `getSiteConfig`, `getActiveServices` from `lib/site-data.ts`; all components from Task 2–5.
 - Produces: the real home page at `/`.
 
-- [ ] **Step 1: Rewrite the home page**
+- [x] **Step 1: Rewrite the home page**
 
 Replace `app/page.tsx`:
 
@@ -464,7 +464,7 @@ export default async function Home() {
 }
 ```
 
-- [ ] **Step 2: Verify it compiles**
+- [x] **Step 2: Verify it compiles**
 
 ```bash
 npx tsc --noEmit
@@ -472,7 +472,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 3: Verify the seeded data renders**
+- [x] **Step 3: Verify the seeded data renders**
 
 ```bash
 npm run dev -- --port 3000 &
@@ -484,7 +484,7 @@ curl -sf http://localhost:3000 | grep -o "R\$&nbsp;40,00\|R\$ 40,00"
 
 Expected: all three greps print a match (the seed data from Plan 1: business name, service name, formatted price). Stop the dev server afterward (`kill %1`).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/page.tsx
@@ -502,7 +502,7 @@ git commit -m "feat: compose real home page from site_config and services"
 **Interfaces:**
 - Produces: two static placeholder pages so Header links resolve instead of 404ing. Both are replaced with real flows in Plans 3 and 4 respectively — this task does not implement any booking/cancellation logic.
 
-- [ ] **Step 1: Write the `/agendar` placeholder**
+- [x] **Step 1: Write the `/agendar` placeholder**
 
 Create `app/agendar/page.tsx`:
 
@@ -519,7 +519,7 @@ export default function AgendarPage() {
 }
 ```
 
-- [ ] **Step 2: Write the `/cancelar` placeholder**
+- [x] **Step 2: Write the `/cancelar` placeholder**
 
 Create `app/cancelar/page.tsx`:
 
@@ -536,7 +536,7 @@ export default function CancelarPage() {
 }
 ```
 
-- [ ] **Step 3: Verify it compiles and builds**
+- [x] **Step 3: Verify it compiles and builds**
 
 ```bash
 npx tsc --noEmit
@@ -545,7 +545,7 @@ npm run build
 
 Expected: no errors; build output lists `/agendar` and `/cancelar` as static routes.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/agendar app/cancelar
