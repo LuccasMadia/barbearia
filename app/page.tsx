@@ -1,7 +1,27 @@
-export default function Home() {
+import { getSiteConfig, getActiveServices } from "@/lib/site-data";
+import { Header } from "@/components/site/Header";
+import { Hero } from "@/components/site/Hero";
+import { ServicesSection } from "@/components/site/ServicesSection";
+import { AboutSection } from "@/components/site/AboutSection";
+import { ContactSection } from "@/components/site/ContactSection";
+import { Footer } from "@/components/site/Footer";
+
+export default async function Home() {
+  const [siteConfig, services] = await Promise.all([
+    getSiteConfig(),
+    getActiveServices(),
+  ]);
+
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <p className="text-neutral-500">Site em construção.</p>
-    </main>
+    <>
+      <Header siteConfig={siteConfig} />
+      <main>
+        <Hero siteConfig={siteConfig} />
+        <ServicesSection services={services} />
+        <AboutSection siteConfig={siteConfig} />
+        <ContactSection siteConfig={siteConfig} />
+      </main>
+      <Footer siteConfig={siteConfig} />
+    </>
   );
 }
