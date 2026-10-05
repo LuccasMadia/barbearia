@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import type { Tables } from "@/lib/database.types";
 import { getAvailableSlots, createAppointment } from "@/app/agendar/actions";
 
@@ -29,6 +29,7 @@ export function BookingWizard({
     startsAt: string;
   } | null>(null);
   const [isPending, startTransition] = useTransition();
+  const latestSlotsRequestRef = useRef(0);
 
   function goBack() {
     const idx = STEP_ORDER.indexOf(step);
@@ -39,9 +40,11 @@ export function BookingWizard({
     setDate(nextDate);
     setSelectedSlot(null);
     setSlots([]);
-    if (!serviceId || !barberId || !nextDate) return;
+    if (!serviceId || !barberId || !/^\d{4}-\d{2}-\d{2}$/.test(nextDate)) return;
 
+    const requestId = ++latestSlotsRequestRef.current;
     const result = await getAvailableSlots({ serviceId, barberId, date: nextDate });
+    if (requestId !== latestSlotsRequestRef.current) return;
     setSlots(result.map((s) => s.time));
   }
 
