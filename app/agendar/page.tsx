@@ -1,10 +1,11 @@
-export default function AgendarPage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-2 px-6 text-center">
-      <h1 className="text-xl font-semibold">Agendamento online</h1>
-      <p className="text-neutral-500">
-        Em breve você poderá agendar seu horário diretamente por aqui.
-      </p>
-    </main>
-  );
+import { getActiveServices, getActiveBarbers } from "@/lib/site-data";
+import { BookingWizard } from "@/components/booking/BookingWizard";
+
+export default async function AgendarPage() {
+  const [services, barbers] = await Promise.all([
+    getActiveServices(),
+    getActiveBarbers(),
+  ]);
+
+  return <BookingWizard services={services} barbers={barbers} />;
 }
