@@ -37,3 +37,14 @@ export async function getActiveServices(): Promise<Tables<"services">[]> {
 
   return data ?? [];
 }
+
+export async function getActiveBarbers(): Promise<Tables<"barbers">[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("barbers")
+    .select("*")
+    .eq("active", true)
+    .order("name");
+
+  return data ?? [];
+}
