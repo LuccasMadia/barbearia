@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
 import { ScissorsMark } from "@/components/site/ScissorsMark";
@@ -24,14 +25,28 @@ export default async function AdminLayout({
           <ScissorsMark className="h-5 w-5 text-gold" />
           Painel administrativo
         </span>
-        <form action={signOut}>
-          <button
-            type="submit"
+        <nav className="flex items-center gap-6">
+          <Link
+            href="/admin"
             className="text-sm text-paper-dim transition-colors hover:text-paper"
           >
-            Sair
-          </button>
-        </form>
+            Dashboard
+          </Link>
+          <Link
+            href="/admin/agenda"
+            className="text-sm text-paper-dim transition-colors hover:text-paper"
+          >
+            Agenda
+          </Link>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="text-sm text-paper-dim transition-colors hover:text-paper"
+            >
+              Sair
+            </button>
+          </form>
+        </nav>
       </header>
       <main className="p-6">{children}</main>
     </div>
