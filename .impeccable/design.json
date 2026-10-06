@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T16:45:00.000Z",
+  "title": "Design System: Barbearia Template",
+  "extensions": {
+    "colorMeta": {
+      "gold": { "role": "primary", "displayName": "Brass Gold", "canonical": "#c9a24b" },
+      "gold-bright": { "role": "primary-hover", "displayName": "Bright Gold", "canonical": "#e4c479" },
+      "gold-ink": { "role": "text-on-primary", "displayName": "Gold Ink", "canonical": "#1a1408" },
+      "ink": { "role": "neutral-bg", "displayName": "Charcoal Ink", "canonical": "#0b0b0c" },
+      "ink-raised": { "role": "neutral-bg-raised", "displayName": "Raised Ink", "canonical": "#151513" },
+      "paper": { "role": "neutral-text", "displayName": "Paper", "canonical": "#f3efe6" },
+      "paper-dim": { "role": "neutral-text-muted", "displayName": "Paper Dim", "canonical": "#c9c2b2" },
+      "ink-line": { "role": "border", "displayName": "Gold Hairline", "canonical": "rgba(201,162,75,0.16)" },
+      "ink-line-strong": { "role": "border-strong", "displayName": "Gold Hairline Strong", "canonical": "rgba(201,162,75,0.32)" },
+      "danger": { "role": "error", "displayName": "Signal Red", "canonical": "#d9705a" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (Fraunces)", "purpose": "Headings and price figures only." },
+      "body": { "displayName": "Body (Inter)", "purpose": "Paragraph copy and option labels." },
+      "label": { "displayName": "Label (Inter, tracked uppercase)", "purpose": "Field/column labels inside data, never above a heading." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "rise-in", "value": "0.7s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Hero content's one authored entrance moment; respects prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid gold CTA, used once per screen for the primary action.",
+      "html": "<button class=\"ds-btn-primary\">Agendar horário</button>",
+      "css": ".ds-btn-primary { background: #c9a24b; color: #1a1408; border: none; border-radius: 2px; padding: 14px 28px; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.02em; transition: background 0.2s; } .ds-btn-primary:hover { background: #e4c479; } .ds-btn-primary:focus-visible { outline: 2px solid #c9a24b; outline-offset: 3px; } .ds-btn-primary:disabled { opacity: 0.4; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary CTA, used in the header.",
+      "html": "<button class=\"ds-btn-outline\">Agendar</button>",
+      "css": ".ds-btn-outline { background: transparent; color: #c9a24b; border: 1px solid #c9a24b; border-radius: 2px; padding: 8px 16px; font-size: 0.875rem; font-weight: 500; transition: background 0.2s, color 0.2s; } .ds-btn-outline:hover { background: #c9a24b; color: #1a1408; }"
+    },
+    {
+      "name": "Option Row",
+      "kind": "custom",
+      "refersTo": "option-row",
+      "description": "Selectable row for service/barber choice in the booking flow; the row itself is the control, no separate radio.",
+      "html": "<button class=\"ds-option-row ds-option-row--selected\"><span class=\"ds-option-row__title\">Corte de Cabelo</span><span class=\"ds-option-row__meta\">30 min · R$ 40,00</span></button>",
+      "css": ".ds-option-row { display: block; width: 100%; text-align: left; background: transparent; border: 1px solid rgba(201,162,75,0.16); border-radius: 2px; padding: 12px 16px; color: #f3efe6; transition: border-color 0.2s; } .ds-option-row:hover { border-color: rgba(201,162,75,0.32); } .ds-option-row--selected { border-color: #c9a24b; background: #151513; } .ds-option-row__title { display: block; font-family: Fraunces, Georgia, serif; } .ds-option-row__meta { display: block; margin-top: 2px; font-size: 0.75rem; color: #c9c2b2; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Name/phone fields in the booking summary form.",
+      "html": "<input class=\"ds-input\" placeholder=\"Nome\" />",
+      "css": ".ds-input { width: 100%; background: transparent; border: 1px solid rgba(201,162,75,0.16); border-radius: 2px; padding: 10px 12px; color: #f3efe6; font-size: 0.875rem; } .ds-input::placeholder { color: #c9c2b2; } .ds-input:focus-visible { outline: none; border-color: #c9a24b; }"
+    },
+    {
+      "name": "Calendar Day Cell",
+      "kind": "custom",
+      "description": "Circular day cell in the hand-built month calendar; the one circular exception to the system's 2px-radius default.",
+      "html": "<button class=\"ds-cal-day ds-cal-day--selected\">13</button>",
+      "css": ".ds-cal-day { width: 32px; height: 32px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; color: #f3efe6; background: transparent; transition: background 0.2s, color 0.2s; } .ds-cal-day:hover { background: rgba(201,162,75,0.16); } .ds-cal-day--selected { background: #c9a24b; color: #1a1408; } .ds-cal-day--disabled { color: rgba(201,194,178,0.3); }"
+    },
+    {
+      "name": "Hero Photo",
+      "kind": "custom",
+      "description": "Right-weighted photographic hero treatment: desaturated/brightened real photo, directional ink gradient for text legibility, 105% hover zoom.",
+      "html": "<div class=\"ds-hero\"><img class=\"ds-hero__img\" src=\"/images/hero-barber.webp\" alt=\"\" /><div class=\"ds-hero__scrim\"></div></div>",
+      "css": ".ds-hero { position: relative; overflow: hidden; } .ds-hero__img { width: 100%; height: 100%; object-fit: cover; object-position: 38% 32%; filter: grayscale(0.1) brightness(1.05) saturate(1.05); transition: transform 0.7s cubic-bezier(0.16,1,0.3,1); } .ds-hero:hover .ds-hero__img { transform: scale(1.05); } .ds-hero__scrim { position: absolute; inset: 0; background: linear-gradient(to left, #0b0b0c, rgba(11,11,12,0.55), transparent); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Private Club Ledger",
+    "overview": "The template reads as a members' barbershop that keeps its own leather-bound ledger, not a bright SaaS booking widget. A near-black charcoal ground carries everything; a single warm brass/gold accent is spent deliberately, never scattered. A serif display face gives headlines the weight of a letterpress sign, while a plain geometric sans keeps the working parts legible and quiet. Separation comes from thin gold hairlines and negative space, not boxes or shadows.",
+    "keyCharacteristics": [
+      "Near-black ground, one gold accent, nothing else competes for attention",
+      "Serif display (Fraunces) for headlines, geometric sans (Inter) everywhere functional",
+      "Hairline rules and whitespace replace cards and shadows as the separation device",
+      "Flat throughout — no elevation, no blur, no gradients beyond the hero photo's darkening overlay",
+      "The hero carries the template's one real photograph, desaturated and darkened into the palette rather than shown at full color"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Gold is the only saturated color in the system. A new element earns gold or stays in paper/paper-dim — never a second hue.", "section": "colors" },
+      { "name": "The No-Kicker Rule", "body": "No eyebrow or kicker line ever sits above a heading. Uppercase tracked labels are used only as field/column labels inside data.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces never lift. A selected or active element gets a gold border and/or the ink-raised fill, never a shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do spend gold on exactly one thing per view: the primary action, the active state, or the price.",
+      "Do separate content with gold-tinted hairlines and whitespace, not boxes or shadows.",
+      "Do keep all business content sourced from site_config/services/barbers — never hardcode a shop's identity into a component."
+    ],
+    "donts": [
+      "Don't add a kicker/eyebrow line above any heading.",
+      "Don't introduce a second accent hue, a card-grid scaffold, or any box-shadow.",
+      "Don't invent customer-facing claims (ratings, testimonials, years of experience) not backed by real data."
+    ]
+  }
+}

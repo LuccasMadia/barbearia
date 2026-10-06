@@ -2,13 +2,6 @@
   "detector": {
     "ignoreRules": [],
     "ignoreFiles": [],
-    "ignoreValues": [
-      {
-        "rule": "overused-font",
-        "value": "arial",
-        "createdAt": "2026-10-05T17:52:37.023Z",
-        "reason": "user confirmed: template placeholder typography, revisit when a real client's brand is applied"
-      }
-    ]
+    "ignoreValues": []
   }
 }
