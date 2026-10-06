@@ -62,7 +62,7 @@ export function getAvailableSlots(params: {
   return slots.sort((a, b) => a.getTime() - b.getTime());
 }
 
-function timeStringToDate(date: Date, time: string): Date {
+export function timeStringToDate(date: Date, time: string): Date {
   const [hours, minutes, seconds] = time.split(":").map(Number);
   const result = new Date(date);
   result.setHours(hours, minutes, seconds ?? 0, 0);
