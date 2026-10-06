@@ -1,22 +1,48 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Tables } from "@/lib/database.types";
 
 export function Hero({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
   return (
-    <section
-      className="flex flex-col items-center gap-6 px-6 py-24 text-center text-white"
-      style={{ backgroundColor: siteConfig.primary_color }}
-    >
-      <h1 className="text-3xl font-bold sm:text-5xl">{siteConfig.name}</h1>
-      {siteConfig.about && (
-        <p className="max-w-xl text-white/80">{siteConfig.about}</p>
-      )}
-      <Link
-        href="/agendar"
-        className="rounded bg-white px-6 py-3 font-semibold text-neutral-900 hover:bg-white/90"
-      >
-        Agendar horário
-      </Link>
+    <section className="group relative isolate overflow-hidden border-b border-ink-line">
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/images/hero-barber.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[38%_32%] grayscale-[0.1] brightness-[1.05] saturate-[1.05] transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-l from-ink via-ink/55 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/10" />
+      </div>
+
+      <div className="relative mx-auto flex min-h-[640px] max-w-6xl flex-col justify-center px-6 py-28">
+        <div className="ml-auto max-w-xl animate-rise-in text-right">
+          <h1 className="font-display text-5xl leading-[1.05] text-paper sm:text-6xl">
+            {siteConfig.name}
+          </h1>
+          {siteConfig.about && (
+            <p className="mt-6 ml-auto max-w-md text-balance text-base leading-relaxed text-paper-dim">
+              {siteConfig.about}
+            </p>
+          )}
+          <div className="mt-10 flex flex-wrap items-center justify-end gap-6">
+            {siteConfig.opening_hours && (
+              <span className="text-sm text-paper-dim">
+                {siteConfig.opening_hours}
+              </span>
+            )}
+            <Link
+              href="/agendar"
+              className="rounded-sm bg-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-gold-ink transition-colors hover:bg-gold-bright"
+            >
+              Agendar horário
+            </Link>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
