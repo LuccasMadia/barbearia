@@ -1,4 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  buildDayTimeline,
+  type AgendaAppointment,
+  type AgendaSlot,
+  type AgendaStatus,
+  type AgendaOrigin,
+} from "@/lib/day-agenda";
+import { timeStringToDate } from "@/lib/slots";
 
 type BreakdownRow = { name: string; count: number; revenueCents: number };
 
@@ -129,4 +137,84 @@ export async function getUpcomingAppointments(
     serviceName: serviceById.get(a.service_id) ?? "—",
     origin: a.origin,
   }));
+}
+
+export type BarberDayColumn = {
+  barberId: string;
+  barberName: string;
+  hasScheduleToday: boolean;
+  slots: AgendaSlot[];
+};
+
+export type DayAgenda = {
+  date: string;
+  barbers: BarberDayColumn[];
+};
+
+export async function getDayAgenda(date: string): Promise<DayAgenda> {
+  const supabase = await createClient();
+  const dayStart = new Date(`${date}T00:00:00`);
+  const dayEnd = new Date(`${date}T23:59:59.999`);
+  const weekday = dayStart.getDay();
+
+  const [{ data: barbers }, { data: schedules }, { data: appointments }, { data: services }, { data: clients }] =
+    await Promise.all([
+      supabase.from("barbers").select("id, name").eq("active", true).order("name"),
+      supabase
+        .from("barber_schedules")
+        .select("barber_id, start_time, end_time")
+        .eq("weekday", weekday),
+      supabase
+        .from("appointments")
+        .select("id, barber_id, service_id, client_id, starts_at, ends_at, status, origin")
+        .gte("starts_at", dayStart.toISOString())
+        .lte("starts_at", dayEnd.toISOString()),
+      supabase.from("services").select("id, name"),
+      supabase.from("clients").select("id, name"),
+    ]);
+
+  const serviceByIdForAgenda = new Map((services ?? []).map((s) => [s.id, s.name]));
+  const clientById = new Map((clients ?? []).map((c) => [c.id, c.name]));
+
+  const windowsByBarber = new Map<string, { start: Date; end: Date }[]>();
+  for (const rule of schedules ?? []) {
+    const list = windowsByBarber.get(rule.barber_id) ?? [];
+    list.push({
+      start: timeStringToDate(dayStart, rule.start_time),
+      end: timeStringToDate(dayStart, rule.end_time),
+    });
+    windowsByBarber.set(rule.barber_id, list);
+  }
+
+  const appointmentsByBarber = new Map<string, AgendaAppointment[]>();
+  for (const appt of appointments ?? []) {
+    const list = appointmentsByBarber.get(appt.barber_id) ?? [];
+    list.push({
+      id: appt.id,
+      startsAt: new Date(appt.starts_at),
+      endsAt: new Date(appt.ends_at),
+      clientName: clientById.get(appt.client_id) ?? "—",
+      serviceName: serviceByIdForAgenda.get(appt.service_id) ?? "—",
+      serviceId: appt.service_id,
+      status: appt.status as AgendaStatus,
+      origin: appt.origin as AgendaOrigin,
+    });
+    appointmentsByBarber.set(appt.barber_id, list);
+  }
+
+  return {
+    date,
+    barbers: (barbers ?? []).map((barber) => {
+      const windows = windowsByBarber.get(barber.id) ?? [];
+      return {
+        barberId: barber.id,
+        barberName: barber.name,
+        hasScheduleToday: windows.length > 0,
+        slots: buildDayTimeline({
+          workWindows: windows,
+          appointments: appointmentsByBarber.get(barber.id) ?? [],
+        }),
+      };
+    }),
+  };
 }
