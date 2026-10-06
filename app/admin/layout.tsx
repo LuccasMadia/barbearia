@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
+import { ScissorsMark } from "@/components/site/ScissorsMark";
 
 export default async function AdminLayout({
   children,
@@ -17,11 +18,17 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-4">
-        <span className="font-semibold">Painel administrativo</span>
+    <div className="min-h-screen bg-ink text-paper">
+      <header className="flex items-center justify-between border-b border-ink-line px-6 py-4">
+        <span className="flex items-center gap-2.5 font-display text-base">
+          <ScissorsMark className="h-5 w-5 text-gold" />
+          Painel administrativo
+        </span>
         <form action={signOut}>
-          <button type="submit" className="text-sm text-neutral-500 hover:underline">
+          <button
+            type="submit"
+            className="text-sm text-paper-dim transition-colors hover:text-paper"
+          >
             Sair
           </button>
         </form>
