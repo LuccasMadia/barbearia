@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
+const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const MONTH_LABELS = [
   "Janeiro",
   "Fevereiro",
@@ -43,55 +43,68 @@ export function AgendaMonthCalendar({
   const today = new Date();
   const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
+  const totalCells = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
   const cells: Array<{ day: number; key: string } | null> = [];
   for (let i = 0; i < firstWeekday; i++) cells.push(null);
   for (let day = 1; day <= daysInMonth; day++) {
     cells.push({ day, key: toDateKey(year, monthIndex, day) });
   }
+  while (cells.length < totalCells) cells.push(null);
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <Link
-          href={`/admin/agenda?month=${shiftMonth(month, -1)}`}
-          aria-label="Mês anterior"
-          className="rounded-sm p-1.5 text-paper-dim transition-colors hover:text-gold"
-        >
-          ‹
-        </Link>
-        <span className="text-sm text-paper">
+        <span className="font-display text-2xl text-gold">
           {MONTH_LABELS[monthIndex]} {year}
         </span>
-        <Link
-          href={`/admin/agenda?month=${shiftMonth(month, 1)}`}
-          aria-label="Próximo mês"
-          className="rounded-sm p-1.5 text-paper-dim transition-colors hover:text-gold"
-        >
-          ›
-        </Link>
+        <div className="flex items-center gap-1">
+          <Link
+            href={`/admin/agenda?month=${shiftMonth(month, -1)}`}
+            aria-label="Mês anterior"
+            className="rounded-sm p-1.5 text-paper-dim transition-colors hover:text-gold"
+          >
+            ‹
+          </Link>
+          <Link
+            href={`/admin/agenda?month=${shiftMonth(month, 1)}`}
+            aria-label="Próximo mês"
+            className="rounded-sm p-1.5 text-paper-dim transition-colors hover:text-gold"
+          >
+            ›
+          </Link>
+        </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-7 gap-y-1 text-center">
-        {WEEKDAY_LABELS.map((label, i) => (
-          <span key={i} className="pb-2 text-[11px] uppercase tracking-wide text-paper-dim">
+      <div className="mt-4 grid grid-cols-7 border-l border-t border-ink-line">
+        {WEEKDAY_LABELS.map((label) => (
+          <div
+            key={label}
+            className="border-b border-r border-ink-line bg-ink-raised py-2 text-center text-xs font-semibold uppercase tracking-wide text-gold"
+          >
             {label}
-          </span>
+          </div>
         ))}
 
         {cells.map((cell, i) =>
           cell === null ? (
-            <span key={`blank-${i}`} />
+            <div key={`blank-${i}`} className="border-b border-r border-ink-line" />
           ) : (
             <Link
               key={cell.key}
               href={`/admin/agenda/${cell.key}`}
-              className={`mx-auto flex h-14 w-14 flex-col items-center justify-center gap-0.5 rounded-sm transition-colors hover:bg-ink-line ${
-                cell.key === todayKey ? "border border-gold" : ""
+              className={`flex min-h-20 flex-col gap-1 border-b border-r border-ink-line p-2 transition-colors hover:bg-ink-line ${
+                cell.key === todayKey ? "bg-ink-raised" : ""
               }`}
             >
-              <span className="text-sm text-paper">{cell.day}</span>
+              <span
+                className={`text-sm ${cell.key === todayKey ? "font-semibold text-gold" : "text-paper"}`}
+              >
+                {cell.day}
+              </span>
               {(summary[cell.key] ?? 0) > 0 && (
-                <span className="text-xs text-gold">{summary[cell.key]}</span>
+                <span className="text-xs text-gold">
+                  {summary[cell.key]} agend.
+                </span>
               )}
             </Link>
           )
