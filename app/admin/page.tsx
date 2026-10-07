@@ -1,5 +1,9 @@
-import { getMonthSummary, getUpcomingAppointments } from "@/lib/admin-data";
+import { getPeriodSummary, getUpcomingAppointments } from "@/lib/admin-data";
+import type { Period } from "@/lib/period";
 import { formatPriceBRL } from "@/lib/format";
+import { PeriodFilter } from "@/components/admin/PeriodFilter";
+import { RevenueByDayChart } from "@/components/admin/RevenueByDayChart";
+import { BreakdownBarChart } from "@/components/admin/BreakdownBarChart";
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("pt-BR", {
@@ -11,9 +15,26 @@ function formatDateTime(iso: string) {
   });
 }
 
-export default async function AdminDashboardPage() {
+const PERIOD_LABELS: Record<Period, string> = {
+  today: "Hoje",
+  week: "Esta semana",
+  month: "Este mês",
+};
+
+function parsePeriod(value: string | undefined): Period {
+  return value === "today" || value === "week" ? value : "month";
+}
+
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string }>;
+}) {
+  const params = await searchParams;
+  const period = parsePeriod(params.period);
+
   const [summary, upcoming] = await Promise.all([
-    getMonthSummary(),
+    getPeriodSummary(period),
     getUpcomingAppointments(10),
   ]);
 
@@ -22,14 +43,18 @@ export default async function AdminDashboardPage() {
       <div>
         <h1 className="font-display text-2xl text-paper">Dashboard</h1>
         <p className="mt-1 text-sm text-paper-dim">
-          Resumo do mês atual e próximos agendamentos.
+          Resumo do período selecionado e próximos agendamentos.
         </p>
       </div>
 
       <section>
-        <h2 className="text-xs uppercase tracking-[0.2em] text-paper-dim">
-          Este mês
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 className="text-xs uppercase tracking-[0.2em] text-paper-dim">
+            {PERIOD_LABELS[period]}
+          </h2>
+          <PeriodFilter active={period} />
+        </div>
+
         <dl className="mt-4 flex flex-wrap items-baseline gap-x-12 gap-y-6 border-t border-ink-line pt-6">
           <div>
             <dt className="text-sm text-paper-dim">Faturamento</dt>
@@ -50,6 +75,10 @@ export default async function AdminDashboardPage() {
             </dd>
           </div>
         </dl>
+
+        <div className="mt-8">
+          <RevenueByDayChart days={summary.byDay} />
+        </div>
       </section>
 
       <div className="grid gap-16 sm:grid-cols-2">
@@ -59,25 +88,12 @@ export default async function AdminDashboardPage() {
           </h2>
           {summary.byService.length === 0 ? (
             <p className="mt-4 text-sm text-paper-dim">
-              Nenhum atendimento concluído neste mês ainda.
+              Nenhum atendimento concluído neste período ainda.
             </p>
           ) : (
-            <ul className="mt-4 divide-y divide-ink-line border-t border-ink-line">
-              {summary.byService.map((row) => (
-                <li
-                  key={row.name}
-                  className="flex items-center gap-4 py-3 text-sm"
-                >
-                  <span className="flex-1 text-paper">{row.name}</span>
-                  <span className="w-10 shrink-0 text-right tabular-nums text-paper-dim">
-                    {row.count}×
-                  </span>
-                  <span className="w-24 shrink-0 text-right tabular-nums text-gold">
-                    {formatPriceBRL(row.revenueCents)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-4">
+              <BreakdownBarChart rows={summary.byService} />
+            </div>
           )}
         </section>
 
@@ -87,25 +103,12 @@ export default async function AdminDashboardPage() {
           </h2>
           {summary.byBarber.length === 0 ? (
             <p className="mt-4 text-sm text-paper-dim">
-              Nenhum atendimento concluído neste mês ainda.
+              Nenhum atendimento concluído neste período ainda.
             </p>
           ) : (
-            <ul className="mt-4 divide-y divide-ink-line border-t border-ink-line">
-              {summary.byBarber.map((row) => (
-                <li
-                  key={row.name}
-                  className="flex items-center gap-4 py-3 text-sm"
-                >
-                  <span className="flex-1 text-paper">{row.name}</span>
-                  <span className="w-10 shrink-0 text-right tabular-nums text-paper-dim">
-                    {row.count}×
-                  </span>
-                  <span className="w-24 shrink-0 text-right tabular-nums text-gold">
-                    {formatPriceBRL(row.revenueCents)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-4">
+              <BreakdownBarChart rows={summary.byBarber} />
+            </div>
           )}
         </section>
       </div>
