@@ -30,22 +30,22 @@ export default async function AdminDashboardPage() {
         <h2 className="text-xs uppercase tracking-[0.2em] text-paper-dim">
           Este mês
         </h2>
-        <dl className="mt-4 grid gap-x-10 gap-y-4 border-t border-ink-line pt-4 sm:grid-cols-3">
+        <dl className="mt-4 flex flex-wrap items-baseline gap-x-12 gap-y-6 border-t border-ink-line pt-6">
           <div>
             <dt className="text-sm text-paper-dim">Faturamento</dt>
-            <dd className="mt-1 font-display text-2xl text-gold">
+            <dd className="mt-1 font-display text-4xl tabular-nums text-gold">
               {formatPriceBRL(summary.revenueCents)}
             </dd>
           </div>
           <div>
             <dt className="text-sm text-paper-dim">Atendimentos concluídos</dt>
-            <dd className="mt-1 font-display text-2xl text-paper">
+            <dd className="mt-1 font-display text-xl tabular-nums text-paper-dim">
               {summary.completedCount}
             </dd>
           </div>
           <div>
             <dt className="text-sm text-paper-dim">Total de agendamentos</dt>
-            <dd className="mt-1 font-display text-2xl text-paper">
+            <dd className="mt-1 font-display text-xl tabular-nums text-paper-dim">
               {summary.appointmentCount}
             </dd>
           </div>
@@ -66,11 +66,13 @@ export default async function AdminDashboardPage() {
               {summary.byService.map((row) => (
                 <li
                   key={row.name}
-                  className="flex items-center justify-between py-3 text-sm"
+                  className="flex items-center gap-4 py-3 text-sm"
                 >
-                  <span className="text-paper">{row.name}</span>
-                  <span className="text-paper-dim">{row.count}×</span>
-                  <span className="text-gold">
+                  <span className="flex-1 text-paper">{row.name}</span>
+                  <span className="w-10 shrink-0 text-right tabular-nums text-paper-dim">
+                    {row.count}×
+                  </span>
+                  <span className="w-24 shrink-0 text-right tabular-nums text-gold">
                     {formatPriceBRL(row.revenueCents)}
                   </span>
                 </li>
@@ -92,11 +94,13 @@ export default async function AdminDashboardPage() {
               {summary.byBarber.map((row) => (
                 <li
                   key={row.name}
-                  className="flex items-center justify-between py-3 text-sm"
+                  className="flex items-center gap-4 py-3 text-sm"
                 >
-                  <span className="text-paper">{row.name}</span>
-                  <span className="text-paper-dim">{row.count}×</span>
-                  <span className="text-gold">
+                  <span className="flex-1 text-paper">{row.name}</span>
+                  <span className="w-10 shrink-0 text-right tabular-nums text-paper-dim">
+                    {row.count}×
+                  </span>
+                  <span className="w-24 shrink-0 text-right tabular-nums text-gold">
                     {formatPriceBRL(row.revenueCents)}
                   </span>
                 </li>
@@ -119,14 +123,18 @@ export default async function AdminDashboardPage() {
             {upcoming.map((appt) => (
               <li
                 key={appt.id}
-                className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 py-3 text-sm"
+                className="flex flex-wrap items-center gap-x-6 gap-y-1 py-3 text-sm"
               >
-                <span className="w-40 shrink-0 text-paper">
+                <span className="w-40 shrink-0 tabular-nums text-paper">
                   {formatDateTime(appt.startsAt)}
                 </span>
                 <span className="flex-1 text-paper">{appt.clientName}</span>
-                <span className="text-paper-dim">{appt.serviceName}</span>
-                <span className="text-paper-dim">{appt.barberName}</span>
+                <span className="w-32 shrink-0 text-paper-dim">
+                  {appt.serviceName}
+                </span>
+                <span className="w-28 shrink-0 text-paper-dim">
+                  {appt.barberName}
+                </span>
               </li>
             ))}
           </ul>
