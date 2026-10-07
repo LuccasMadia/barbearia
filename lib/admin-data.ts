@@ -7,16 +7,9 @@ import {
   type AgendaOrigin,
 } from "@/lib/day-agenda";
 import { timeStringToDate } from "@/lib/slots";
+import { periodRange, enumerateDays, type Period } from "@/lib/period";
 
-type BreakdownRow = { name: string; count: number; revenueCents: number };
-
-export type MonthSummary = {
-  revenueCents: number;
-  appointmentCount: number;
-  completedCount: number;
-  byService: BreakdownRow[];
-  byBarber: BreakdownRow[];
-};
+export type BreakdownRow = { name: string; count: number; revenueCents: number };
 
 export type UpcomingAppointment = {
   id: string;
@@ -27,21 +20,28 @@ export type UpcomingAppointment = {
   origin: string;
 };
 
-function startOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
+export type DaySummary = { date: string; revenueCents: number };
 
-export async function getMonthSummary(): Promise<MonthSummary> {
+export type PeriodSummary = {
+  revenueCents: number;
+  appointmentCount: number;
+  completedCount: number;
+  byService: BreakdownRow[];
+  byBarber: BreakdownRow[];
+  byDay: DaySummary[];
+};
+
+export async function getPeriodSummary(period: Period): Promise<PeriodSummary> {
   const supabase = await createClient();
-  const now = new Date();
-  const monthStart = startOfMonth(now);
+  const { start, end } = periodRange(period, new Date());
 
   const [{ data: appointments }, { data: services }, { data: barbers }] =
     await Promise.all([
       supabase
         .from("appointments")
-        .select("status, service_id, barber_id")
-        .gte("starts_at", monthStart.toISOString()),
+        .select("status, service_id, barber_id, starts_at")
+        .gte("starts_at", start.toISOString())
+        .lt("starts_at", end.toISOString()),
       supabase.from("services").select("id, name, price_cents"),
       supabase.from("barbers").select("id, name"),
     ]);
@@ -51,6 +51,9 @@ export async function getMonthSummary(): Promise<MonthSummary> {
 
   const byServiceMap = new Map<string, BreakdownRow>();
   const byBarberMap = new Map<string, BreakdownRow>();
+  const byDayMap = new Map<string, number>(
+    enumerateDays({ start, end }).map((d) => [toDateKey(d), 0])
+  );
   let revenueCents = 0;
   let completedCount = 0;
 
@@ -62,6 +65,9 @@ export async function getMonthSummary(): Promise<MonthSummary> {
     const barber = barberById.get(appt.barber_id);
     const priceCents = service?.price_cents ?? 0;
     revenueCents += priceCents;
+
+    const dayKey = toDateKey(new Date(appt.starts_at));
+    byDayMap.set(dayKey, (byDayMap.get(dayKey) ?? 0) + priceCents);
 
     if (service) {
       const row = byServiceMap.get(service.id) ?? {
@@ -96,6 +102,9 @@ export async function getMonthSummary(): Promise<MonthSummary> {
     byBarber: Array.from(byBarberMap.values()).sort(
       (a, b) => b.revenueCents - a.revenueCents
     ),
+    byDay: Array.from(byDayMap.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, dayRevenueCents]) => ({ date, revenueCents: dayRevenueCents })),
   };
 }
 
