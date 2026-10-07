@@ -218,3 +218,30 @@ export async function getDayAgenda(date: string): Promise<DayAgenda> {
     }),
   };
 }
+
+function toDateKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+export async function getMonthAgendaSummary(month: string): Promise<Record<string, number>> {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const monthStart = new Date(year, monthNumber - 1, 1);
+  const monthEnd = new Date(year, monthNumber, 1);
+
+  const supabase = await createClient();
+  const { data: appointments } = await supabase
+    .from("appointments")
+    .select("starts_at")
+    .gte("starts_at", monthStart.toISOString())
+    .lt("starts_at", monthEnd.toISOString());
+
+  const summary: Record<string, number> = {};
+  for (const appt of appointments ?? []) {
+    const key = toDateKey(new Date(appt.starts_at));
+    summary[key] = (summary[key] ?? 0) + 1;
+  }
+  return summary;
+}
