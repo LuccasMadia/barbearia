@@ -1,10 +1,8 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, type AdminClient } from "@/lib/supabase/admin";
 import { getAvailableSlots as calculateAvailableSlots } from "@/lib/slots";
-import { normalizePhone } from "@/lib/phone";
+import { upsertClientByPhone } from "@/lib/clients-server";
 
 export const SLOT_INTERVAL_MINUTES = 15;
-
-export type AdminClient = ReturnType<typeof createAdminClient>;
 
 export async function getCandidateBarberIds(
   admin: AdminClient,
@@ -112,31 +110,11 @@ export async function resolveAndCreateAppointment(input: {
     };
   }
 
-  const normalizedPhone = normalizePhone(input.phone);
-
-  const { data: existingClient } = await admin
-    .from("clients")
-    .select("id, name")
-    .eq("phone", normalizedPhone)
-    .maybeSingle();
-
   let clientId: string;
-  if (existingClient) {
-    clientId = existingClient.id;
-    if (existingClient.name !== input.name) {
-      await admin.from("clients").update({ name: input.name }).eq("id", clientId);
-    }
-  } else {
-    const { data: newClient, error: clientError } = await admin
-      .from("clients")
-      .insert({ name: input.name, phone: normalizedPhone })
-      .select("id")
-      .single();
-
-    if (clientError || !newClient) {
-      return { success: false, error: "Não foi possível salvar seus dados. Tente novamente." };
-    }
-    clientId = newClient.id;
+  try {
+    clientId = await upsertClientByPhone(admin, { name: input.name, phone: input.phone });
+  } catch {
+    return { success: false, error: "Não foi possível salvar seus dados. Tente novamente." };
   }
 
   const { error: appointmentError } = await admin.from("appointments").insert({

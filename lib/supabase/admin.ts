@@ -15,3 +15,5 @@ export function createAdminClient() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
+
+export type AdminClient = ReturnType<typeof createAdminClient>;
