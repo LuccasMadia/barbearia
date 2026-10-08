@@ -2,6 +2,7 @@ import type { AdminClient } from "@/lib/supabase/admin";
 import { upsertClientByPhone } from "@/lib/clients-server";
 import { normalizePhone } from "@/lib/phone";
 import { estimateWaitMinutes, type QueueBarberState, type QueueWaitEntry } from "@/lib/queue-wait";
+import { isAnyBarberOnShiftNow, isQueueEffectivelyOpen, type ScheduleWindow } from "@/lib/business-hours";
 
 type WaitingRow = QueueWaitEntry & {
   createdAt: Date;
@@ -29,7 +30,10 @@ export type QueueBoardWaitingItem = {
 };
 
 export type QueueBoard = {
+  /** Manual toggle plus at least one active barber on shift right now. */
   queueOpen: boolean;
+  /** Raw value of the manual toggle, regardless of schedule. */
+  queueOpenManual: boolean;
   barbers: QueueBoardBarberColumn[];
   waiting: QueueBoardWaitingItem[];
 };
@@ -44,6 +48,7 @@ export async function getQueueBoard(admin: AdminClient): Promise<QueueBoard> {
     { data: waitingRows },
     { data: services },
     { data: clients },
+    { data: scheduleRows },
   ] = await Promise.all([
     admin.from("site_config").select("queue_open").limit(1).maybeSingle(),
     admin.from("barbers").select("id, name").eq("active", true).order("name"),
@@ -58,6 +63,7 @@ export async function getQueueBoard(admin: AdminClient): Promise<QueueBoard> {
       .order("created_at", { ascending: true }),
     admin.from("services").select("id, name, duration_minutes"),
     admin.from("clients").select("id, name"),
+    admin.from("barber_schedules").select("barber_id, weekday, start_time, end_time"),
   ]);
 
   const serviceById = new Map((services ?? []).map((s) => [s.id, s]));
@@ -66,6 +72,13 @@ export async function getQueueBoard(admin: AdminClient): Promise<QueueBoard> {
   const inServiceByBarber = new Map(
     (inService ?? []).map((row) => [row.barber_id as string, row])
   );
+
+  const activeBarberIds = new Set((barbers ?? []).map((b) => b.id));
+  const scheduleWindows: ScheduleWindow[] = (scheduleRows ?? [])
+    .filter((row) => activeBarberIds.has(row.barber_id))
+    .map((row) => ({ weekday: row.weekday, startTime: row.start_time, endTime: row.end_time }));
+  const queueOpenManual = siteConfig?.queue_open ?? false;
+  const queueOpen = queueOpenManual && isAnyBarberOnShiftNow(scheduleWindows, now.getDay(), now);
 
   const barberStates: QueueBarberState[] = (barbers ?? []).map((b) => {
     const current = inServiceByBarber.get(b.id);
@@ -99,7 +112,8 @@ export async function getQueueBoard(admin: AdminClient): Promise<QueueBoard> {
   }));
 
   return {
-    queueOpen: siteConfig?.queue_open ?? false,
+    queueOpen,
+    queueOpenManual,
     barbers: (barbers ?? []).map((b) => {
       const current = inServiceByBarber.get(b.id);
       return {
@@ -200,13 +214,8 @@ export async function joinQueue(
   admin: AdminClient,
   input: { serviceId: string; barberId: string; name: string; phone: string }
 ): Promise<JoinQueueResult> {
-  const { data: siteConfig } = await admin
-    .from("site_config")
-    .select("queue_open")
-    .limit(1)
-    .maybeSingle();
-
-  if (!siteConfig?.queue_open) {
+  const effectivelyOpen = await isQueueEffectivelyOpen(admin);
+  if (!effectivelyOpen) {
     return { success: false, error: "A fila está fechada no momento." };
   }
 
