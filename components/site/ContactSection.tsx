@@ -2,15 +2,17 @@ import type { Tables } from "@/lib/database.types";
 
 export function ContactSection({
   siteConfig,
+  openingHoursSummary,
 }: {
   siteConfig: Tables<"site_config">;
+  openingHoursSummary: string | null;
 }) {
   const hasContact =
     siteConfig.address ||
     siteConfig.phone ||
     siteConfig.whatsapp ||
     siteConfig.instagram ||
-    siteConfig.opening_hours;
+    openingHoursSummary;
 
   if (!hasContact) return null;
 
@@ -22,12 +24,12 @@ export function ContactSection({
             Contato
           </h2>
           <dl className="mt-10 space-y-5 text-sm">
-            {siteConfig.opening_hours && (
+            {openingHoursSummary && (
               <div className="border-t border-ink-line pt-5">
                 <dt className="text-xs uppercase tracking-[0.2em] text-paper-dim">
                   Horário
                 </dt>
-                <dd className="mt-1.5 text-paper">{siteConfig.opening_hours}</dd>
+                <dd className="mt-1.5 text-paper">{openingHoursSummary}</dd>
               </div>
             )}
             {siteConfig.address && (

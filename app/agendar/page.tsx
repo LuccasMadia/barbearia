@@ -3,15 +3,18 @@ import {
   getActiveBarbers,
   getSiteConfig,
 } from "@/lib/site-data";
+import { getOpeningHoursSummary } from "@/lib/business-hours";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 
 export default async function AgendarPage() {
-  const [siteConfig, services, barbers] = await Promise.all([
+  const [siteConfig, services, barbers, openingHoursSummary] = await Promise.all([
     getSiteConfig(),
     getActiveServices(),
     getActiveBarbers(),
+    getOpeningHoursSummary(createAdminClient()),
   ]);
 
   return (
@@ -20,7 +23,7 @@ export default async function AgendarPage() {
       <main className="flex-1">
         <BookingWizard services={services} barbers={barbers} />
       </main>
-      <Footer siteConfig={siteConfig} />
+      <Footer siteConfig={siteConfig} openingHoursSummary={openingHoursSummary} />
     </>
   );
 }

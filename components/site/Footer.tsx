@@ -2,7 +2,13 @@ import Link from "next/link";
 import type { Tables } from "@/lib/database.types";
 import { ScissorsMark } from "./ScissorsMark";
 
-export function Footer({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
+export function Footer({
+  siteConfig,
+  openingHoursSummary,
+}: {
+  siteConfig: Tables<"site_config">;
+  openingHoursSummary: string | null;
+}) {
   return (
     <footer className="border-t border-ink-line bg-ink">
       <div className="mx-auto max-w-6xl px-6 py-12">
@@ -15,7 +21,7 @@ export function Footer({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
           <div className="flex flex-col gap-1 text-sm text-paper-dim">
             {siteConfig.address && <span>{siteConfig.address}</span>}
             {siteConfig.phone && <span>{siteConfig.phone}</span>}
-            {siteConfig.opening_hours && <span>{siteConfig.opening_hours}</span>}
+            {openingHoursSummary && <span>{openingHoursSummary}</span>}
           </div>
 
           <div className="flex gap-6 text-sm">

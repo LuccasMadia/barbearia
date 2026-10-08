@@ -3,6 +3,8 @@ import {
   getActiveServices,
   getActiveBarbers,
 } from "@/lib/site-data";
+import { getOpeningHoursSummary } from "@/lib/business-hours";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { ServicesSection } from "@/components/site/ServicesSection";
@@ -11,22 +13,23 @@ import { ContactSection } from "@/components/site/ContactSection";
 import { Footer } from "@/components/site/Footer";
 
 export default async function Home() {
-  const [siteConfig, services, barbers] = await Promise.all([
+  const [siteConfig, services, barbers, openingHoursSummary] = await Promise.all([
     getSiteConfig(),
     getActiveServices(),
     getActiveBarbers(),
+    getOpeningHoursSummary(createAdminClient()),
   ]);
 
   return (
     <>
       <Header siteConfig={siteConfig} />
       <main>
-        <Hero siteConfig={siteConfig} />
+        <Hero siteConfig={siteConfig} openingHoursSummary={openingHoursSummary} />
         <ServicesSection services={services} />
         <BarbersSection barbers={barbers} />
-        <ContactSection siteConfig={siteConfig} />
+        <ContactSection siteConfig={siteConfig} openingHoursSummary={openingHoursSummary} />
       </main>
-      <Footer siteConfig={siteConfig} />
+      <Footer siteConfig={siteConfig} openingHoursSummary={openingHoursSummary} />
     </>
   );
 }

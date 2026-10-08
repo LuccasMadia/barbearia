@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Tables } from "@/lib/database.types";
 
-export function Hero({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
+export function Hero({
+  siteConfig,
+  openingHoursSummary,
+}: {
+  siteConfig: Tables<"site_config">;
+  openingHoursSummary: string | null;
+}) {
   return (
     <section className="group relative isolate overflow-hidden border-b border-ink-line">
       <div className="absolute inset-0 -z-10">
@@ -28,19 +34,23 @@ export function Hero({ siteConfig }: { siteConfig: Tables<"site_config"> }) {
               {siteConfig.about}
             </p>
           )}
-          <div className="mt-10 flex flex-wrap items-center justify-end gap-6">
-            {siteConfig.opening_hours && (
-              <span className="text-sm text-paper-dim">
-                {siteConfig.opening_hours}
-              </span>
-            )}
+          <div className="mt-10 flex flex-wrap items-center justify-end gap-4">
             <Link
               href="/agendar"
               className="rounded-sm bg-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-gold-ink transition-colors hover:bg-gold-bright"
             >
               Agendar horário
             </Link>
+            <Link
+              href="/fila"
+              className="rounded-sm border border-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-gold transition-colors hover:bg-gold hover:text-gold-ink"
+            >
+              Fila de atendimento
+            </Link>
           </div>
+          {openingHoursSummary && (
+            <p className="mt-4 text-sm text-paper-dim">{openingHoursSummary}</p>
+          )}
         </div>
       </div>
     </section>
