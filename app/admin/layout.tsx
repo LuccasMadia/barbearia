@@ -44,6 +44,12 @@ export default async function AdminLayout({
           >
             Fila
           </Link>
+          <Link
+            href="/admin/configuracoes"
+            className="text-sm text-paper-dim transition-colors hover:text-paper"
+          >
+            Configurações
+          </Link>
           <form action={signOut}>
             <button
               type="submit"
