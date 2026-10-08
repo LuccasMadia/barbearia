@@ -1,6 +1,43 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import type { Tables } from "@/lib/database.types";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+function HeroCta({
+  href,
+  label,
+  variant,
+}: {
+  href: string;
+  label: string;
+  variant: "solid" | "outline";
+}) {
+  return (
+    <Button
+      asChild
+      className={cn(
+        "group/cta relative h-12 w-fit overflow-hidden rounded-sm ps-7 pe-14 text-sm font-semibold tracking-wide transition-all duration-500 hover:ps-14 hover:pe-7",
+        variant === "solid"
+          ? "bg-gold text-gold-ink hover:bg-gold-bright"
+          : "border border-gold bg-transparent text-gold hover:bg-gold hover:text-gold-ink"
+      )}
+    >
+      <Link href={href}>
+        <span className="relative z-10">{label}</span>
+        <span
+          className={cn(
+            "absolute right-1 flex h-10 w-10 items-center justify-center rounded-sm transition-all duration-500 group-hover/cta:right-[calc(100%-44px)] group-hover/cta:rotate-45",
+            variant === "solid" ? "bg-gold-ink text-gold" : "bg-gold text-gold-ink"
+          )}
+        >
+          <ArrowUpRight size={16} />
+        </span>
+      </Link>
+    </Button>
+  );
+}
 
 export function Hero({
   siteConfig,
@@ -35,18 +72,8 @@ export function Hero({
             </p>
           )}
           <div className="mt-10 flex flex-wrap items-center justify-end gap-4">
-            <Link
-              href="/agendar"
-              className="rounded-sm bg-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-gold-ink transition-colors hover:bg-gold-bright"
-            >
-              Agendar horário
-            </Link>
-            <Link
-              href="/fila"
-              className="rounded-sm border border-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-gold transition-colors hover:bg-gold hover:text-gold-ink"
-            >
-              Fila de atendimento
-            </Link>
+            <HeroCta href="/agendar" label="Agendar horário" variant="solid" />
+            <HeroCta href="/fila" label="Fila de atendimento" variant="outline" />
           </div>
           {openingHoursSummary && (
             <p className="mt-4 text-sm text-paper-dim">{openingHoursSummary}</p>

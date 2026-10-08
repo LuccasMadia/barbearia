@@ -14,6 +14,21 @@
 
   --background: var(--ink);
   --foreground: var(--paper);
+
+  /* shadcn/ui semantic tokens, mapped onto the ink/gold palette above so
+     components pasted from the shadcn ecosystem render on-brand instead of
+     introducing a second, generic color system. */
+  --primary: var(--gold);
+  --primary-foreground: var(--gold-ink);
+  --secondary: var(--ink-raised);
+  --secondary-foreground: var(--paper);
+  --destructive: var(--danger);
+  --destructive-foreground: var(--paper);
+  --accent: var(--ink-raised);
+  --accent-foreground: var(--gold-bright);
+  --border: var(--ink-line);
+  --input: var(--ink-line);
+  --ring: var(--gold);
 }
 
 @theme inline {
@@ -29,6 +44,17 @@
   --color-danger: var(--danger);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-inter);
 }
