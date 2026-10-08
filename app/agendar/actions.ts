@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getClientByPhone } from "@/lib/clients-server";
 import {
   computeBarberSlots,
   getCandidateBarberIds,
@@ -51,4 +52,8 @@ export async function createAppointment(input: {
   phone: string;
 }): Promise<CreateAppointmentResult> {
   return resolveAndCreateAppointment({ ...input, origin: "online" });
+}
+
+export async function lookupClientByPhone(phone: string): Promise<{ name: string } | null> {
+  return getClientByPhone(createAdminClient(), phone);
 }

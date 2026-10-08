@@ -3,7 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Tables } from "@/lib/database.types";
-import { getAvailableSlots, createAppointment } from "@/app/agendar/actions";
+import { getAvailableSlots, createAppointment, lookupClientByPhone } from "@/app/agendar/actions";
 import { formatPriceBRL, formatDuration } from "@/lib/format";
 import { MonthCalendar } from "./MonthCalendar";
 import { ScissorsMark } from "@/components/site/ScissorsMark";
@@ -87,6 +87,14 @@ export function BookingWizard({
     if (serviceId && barberId) {
       void fetchSlots(serviceId, barberId, nextDate);
     }
+  }
+
+  function handlePhoneBlur() {
+    if (phone.replace(/\D/g, "").length < 8) return;
+    startTransition(async () => {
+      const found = await lookupClientByPhone(phone);
+      if (found && !name) setName(found.name);
+    });
   }
 
   function handleSubmit(formEvent: React.FormEvent) {
@@ -330,19 +338,20 @@ export function BookingWizard({
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-3">
             <input
-              type="text"
-              placeholder="Nome"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-sm border border-ink-line bg-transparent px-3 py-2.5 text-sm text-paper placeholder:text-paper-dim focus:border-gold"
-            />
-            <input
               type="tel"
               placeholder="Telefone"
               required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              onBlur={handlePhoneBlur}
+              className="w-full rounded-sm border border-ink-line bg-transparent px-3 py-2.5 text-sm text-paper placeholder:text-paper-dim focus:border-gold"
+            />
+            <input
+              type="text"
+              placeholder="Nome"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full rounded-sm border border-ink-line bg-transparent px-3 py-2.5 text-sm text-paper placeholder:text-paper-dim focus:border-gold"
             />
             {error && <p className="text-sm text-danger">{error}</p>}
