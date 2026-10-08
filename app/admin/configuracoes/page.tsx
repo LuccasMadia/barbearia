@@ -3,6 +3,7 @@ import { ConfiguracoesTabs } from "@/components/admin/configuracoes/Configuracoe
 import { IdentityPanel } from "@/components/admin/configuracoes/IdentityPanel";
 import { BarbersPanel } from "@/components/admin/configuracoes/BarbersPanel";
 import { ServicesPanel } from "@/components/admin/configuracoes/ServicesPanel";
+import { SchedulesPanel } from "@/components/admin/configuracoes/SchedulesPanel";
 
 type Tab = "identidade" | "barbeiros" | "servicos" | "horarios";
 
@@ -42,7 +43,13 @@ export default async function ConfiguracoesPage({
       {tab === "identidade" && siteConfig && <IdentityPanel siteConfig={siteConfig} />}
       {tab === "barbeiros" && <BarbersPanel barbers={barbers ?? []} />}
       {tab === "servicos" && <ServicesPanel services={services ?? []} />}
-      {tab === "horarios" && <p className="text-sm text-paper-dim">{(schedules ?? []).length} linha(s) de horário — painel chega na Task 11.</p>}
+      {tab === "horarios" && (
+        <SchedulesPanel
+          barbers={(barbers ?? []).filter((b) => b.active)}
+          schedules={schedules ?? []}
+          initialBarberId={params.barberId}
+        />
+      )}
     </div>
   );
 }
