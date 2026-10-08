@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Tables } from "@/lib/database.types";
 import { getAvailableSlots, createAppointment, lookupClientByPhone } from "@/app/agendar/actions";
@@ -29,7 +29,9 @@ export function BookingWizard({
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [name, setName] = useState("");
   const nameRef = useRef(name);
-  nameRef.current = name;
+  useEffect(() => {
+    nameRef.current = name;
+  }, [name]);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<{

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Tables } from "@/lib/database.types";
 import { joinQueue, lookupClientByPhone } from "@/app/fila/actions";
@@ -17,7 +17,9 @@ export function QueueJoinForm({
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const nameRef = useRef(name);
-  nameRef.current = name;
+  useEffect(() => {
+    nameRef.current = name;
+  }, [name]);
   const [serviceId, setServiceId] = useState(services[0]?.id ?? "");
   const [barberId, setBarberId] = useState("any");
   const [error, setError] = useState<string | null>(null);
