@@ -1,3 +1,5 @@
+import type { AdminClient } from "@/lib/supabase/admin";
+
 export type ScheduleWindow = {
   weekday: number;
   startTime: string;
@@ -73,4 +75,39 @@ export function summarizeOpeningHours(schedules: ScheduleWindow[]): string | nul
       return `${label}: ${formatHHMM(group.start)}–${formatHHMM(group.end)}`;
     })
     .join(" · ");
+}
+
+export async function getActiveScheduleWindows(admin: AdminClient): Promise<ScheduleWindow[]> {
+  const { data: barbers } = await admin.from("barbers").select("id").eq("active", true);
+  const activeBarberIds = new Set((barbers ?? []).map((b) => b.id));
+  if (activeBarberIds.size === 0) return [];
+
+  const { data: schedules } = await admin
+    .from("barber_schedules")
+    .select("barber_id, weekday, start_time, end_time");
+
+  return (schedules ?? [])
+    .filter((row) => activeBarberIds.has(row.barber_id))
+    .map((row) => ({
+      weekday: row.weekday,
+      startTime: row.start_time,
+      endTime: row.end_time,
+    }));
+}
+
+export async function isQueueEffectivelyOpen(admin: AdminClient): Promise<boolean> {
+  const [{ data: siteConfig }, scheduleWindows] = await Promise.all([
+    admin.from("site_config").select("queue_open").limit(1).maybeSingle(),
+    getActiveScheduleWindows(admin),
+  ]);
+
+  if (!siteConfig?.queue_open) return false;
+
+  const now = new Date();
+  return isAnyBarberOnShiftNow(scheduleWindows, now.getDay(), now);
+}
+
+export async function getOpeningHoursSummary(admin: AdminClient): Promise<string | null> {
+  const scheduleWindows = await getActiveScheduleWindows(admin);
+  return summarizeOpeningHours(scheduleWindows);
 }
