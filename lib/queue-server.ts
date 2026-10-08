@@ -253,3 +253,83 @@ export async function leaveQueue(admin: AdminClient, entryId: string): Promise<v
     .eq("id", entryId)
     .eq("status", "aguardando");
 }
+
+export async function callNextForBarber(
+  admin: AdminClient,
+  barberId: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  const { data: candidates } = await admin
+    .from("queue_entries")
+    .select("id")
+    .eq("status", "aguardando")
+    .or(`barber_id.is.null,barber_id.eq.${barberId}`)
+    .order("created_at", { ascending: true })
+    .limit(1);
+
+  const next = candidates?.[0];
+  if (!next) {
+    return { success: false, error: "Nenhum cliente aguardando para este barbeiro." };
+  }
+
+  await admin
+    .from("queue_entries")
+    .update({
+      status: "em_atendimento",
+      started_at: new Date().toISOString(),
+      barber_id: barberId,
+    })
+    .eq("id", next.id)
+    .eq("status", "aguardando");
+
+  return { success: true };
+}
+
+export async function finishService(admin: AdminClient, entryId: string): Promise<void> {
+  const { data: entry } = await admin
+    .from("queue_entries")
+    .select("client_id, barber_id, service_id, started_at")
+    .eq("id", entryId)
+    .eq("status", "em_atendimento")
+    .maybeSingle();
+
+  if (!entry || !entry.barber_id || !entry.started_at) return;
+
+  const startedAt = new Date(entry.started_at);
+  const now = new Date();
+  const finishedAt = now > startedAt ? now : new Date(startedAt.getTime() + 1000);
+
+  await admin
+    .from("queue_entries")
+    .update({ status: "concluido", finished_at: finishedAt.toISOString() })
+    .eq("id", entryId);
+
+  await admin.from("appointments").insert({
+    client_id: entry.client_id,
+    barber_id: entry.barber_id,
+    service_id: entry.service_id,
+    starts_at: startedAt.toISOString(),
+    ends_at: finishedAt.toISOString(),
+    status: "concluido",
+    origin: "fila",
+  });
+}
+
+export async function removeFromQueue(admin: AdminClient, entryId: string): Promise<void> {
+  await admin
+    .from("queue_entries")
+    .update({ status: "cancelado" })
+    .eq("id", entryId)
+    .eq("status", "aguardando");
+}
+
+export async function setQueueOpen(admin: AdminClient, open: boolean): Promise<void> {
+  const { data: siteConfig } = await admin
+    .from("site_config")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+
+  if (!siteConfig) return;
+
+  await admin.from("site_config").update({ queue_open: open }).eq("id", siteConfig.id);
+}
