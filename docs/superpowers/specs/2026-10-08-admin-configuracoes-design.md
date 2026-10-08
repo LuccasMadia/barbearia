@@ -1,6 +1,6 @@
 # Admin — Aba de Configurações
 
-Status: **em andamento** — seções 1 e 2 aprovadas, seção 3 proposta (aguardando aprovação), seção 4 (testes) ainda não escrita.
+Status: **design completo** — seções 1 a 4 aprovadas. Aguardando auto-revisão e revisão final do usuário antes de transicionar para `writing-plans`.
 
 ## Contexto
 
@@ -35,26 +35,54 @@ Nova rota `/admin/configuracoes`, com link "Configurações" no header do admin 
 
 Todas as ações são Server Actions protegidas por `requireAdmin()` (mesmo padrão de `app/admin/fila/actions.ts`), com `revalidatePath` em `/admin/configuracoes`, `/`, `/agendar`, `/fila`, `/fila/tv`.
 
-## 3. Fila automática + mudanças na Hero (🟡 proposto, aguardando aprovação)
+## 3. Fila automática + mudanças na Hero (✅ aprovado)
 
-**Horário efetivo da fila.** Novo helper `lib/business-hours.ts` com `isAnyBarberOnShiftNow(admin, now)`: pega o `weekday` de agora, busca `barber_schedules` de todos os barbeiros ativos pra esse dia, checa se o horário atual cai dentro de alguma janela. Fila efetivamente aberta = `site_config.queue_open` (toggle manual) **e** `isAnyBarberOnShiftNow`. Entra em dois lugares:
-- `getQueueBoard` (usado por `/admin/fila` e `/fila/tv`) — `queueOpen` passa a refletir o estado efetivo.
-- `joinQueue` — recusa entrada também quando o horário já encerrou, mesmo com o toggle manual ainda em "aberta".
+**Horário efetivo da fila.** Novo `lib/business-hours.ts` com duas funções puras (sem Supabase, recebem dados já carregados — ver seção 4) mais uma camada fininha de busca:
+- `isAnyBarberOnShiftNow(schedules, weekday, now)`: recebe as linhas de `barber_schedules` dos barbeiros ativos, checa se o horário atual cai dentro de alguma janela do `weekday` de hoje.
+- Wiring: `getQueueBoard` e `joinQueue` (`lib/queue-server.ts`) passam a buscar `barber_schedules` dos barbeiros ativos e chamar `isAnyBarberOnShiftNow` antes de decidir o estado efetivo. Fila efetivamente aberta = `site_config.queue_open` (toggle manual) **e** `isAnyBarberOnShiftNow`.
+  - `getQueueBoard` (usado por `/admin/fila` e `/fila/tv`) — `queueOpen` passa a refletir o estado efetivo.
+  - `joinQueue` — recusa entrada também quando o horário já encerrou, mesmo com o toggle manual ainda em "aberta".
 
 No `/admin/fila`, se o toggle manual estiver "aberto" mas o horário efetivo estiver fechado, mostrar aviso: "Fechada automaticamente — fora do horário de atendimento".
 
-**Resumo do horário (texto da Hero).** Novo helper `summarizeOpeningHours(admin)`: pra cada dia da semana, junta as janelas de todos os barbeiros ativos (menor início, maior fim); dias sem nenhum barbeiro trabalhando ficam de fora. Agrupa dias consecutivos com o mesmo horário em faixas — ex. `"Seg a Sex: 09:00–18:00 · Sáb: 09:00–14:00"`. Intervalos de almoço não entram no resumo (só a janela externa do dia).
+**Resumo do horário (texto da Hero).** `summarizeOpeningHours(schedulesByBarber)` é a segunda função pura de `lib/business-hours.ts`: recebe os horários de todos os barbeiros ativos agrupados, junta as janelas por dia da semana (menor início, maior fim); dias sem nenhum barbeiro trabalhando ficam de fora. Agrupa dias consecutivos com o mesmo horário em faixas — ex. `"Seg a Sex: 09:00–18:00 · Sáb: 09:00–14:00"`. Intervalos de almoço não entram no resumo (só a janela externa do dia). A busca dos dados (`lib/site-data.ts`, usado pela home) é quem chama o Supabase e passa o resultado pronto pra essa função.
 
 **Hero (`components/site/Hero.tsx`).** Dois botões lado a lado: "Agendar horário" (existente) e "Fila de atendimento" (novo, estilo secundário/outline, leva pra `/fila` sempre — a própria página já trata o caso de fila fechada). O texto de horário (resumo calculado) desce para uma linha abaixo dos dois botões.
 
-## 4. Testes e validação (⬜ não escrito ainda)
+## 4. Testes e validação (✅ aprovado)
 
-Pendente — continuar na próxima sessão.
+Segue o padrão já usado em `lib/slots.test.ts` e `lib/queue-wait.test.ts`: lógica pura (sem Supabase) em funções que recebem dados já carregados, testada direto com Vitest; o código que busca dados no `AdminClient` (`lib/business-hours.ts` fica fininho e só orquestra) não precisa de teste unitário próprio.
+
+**`lib/business-hours.ts` (novo, lógica pura — testes unitários):**
+- `isAnyBarberOnShiftNow(schedules, weekday, now)`:
+  - `true` quando existe pelo menos uma janela do `weekday` cujo `[start_time, end_time)` contém `now`.
+  - `false` quando não há barbeiro nenhum trabalhando nesse horário (ex: fora do expediente, ou dentro do intervalo de almoço — duas janelas, gap no meio).
+  - `false` quando a lista de `schedules` está vazia (nenhum barbeiro ativo).
+  - Considera janelas de múltiplos barbeiros — basta um estar disponível.
+- `summarizeOpeningHours(schedulesByBarber)`:
+  - Une janelas de todos os barbeiros ativos por dia (menor início, maior fim), ignorando o intervalo de almoço (vira uma janela externa só).
+  - Dia sem nenhum barbeiro trabalhando não aparece no resumo.
+  - Agrupa dias consecutivos com o mesmo horário resultante numa faixa única (ex: Seg–Sex iguais → `"Seg a Sex: 09:00–18:00"`).
+  - Dia isolado com horário diferente dos vizinhos aparece separado (ex: `"· Sáb: 09:00–14:00"`).
+  - Todos os dias fechados → string vazia ou `null` (Hero esconde a linha de horário nesse caso).
+
+**`getQueueBoard` / `joinQueue` (`lib/queue-server.ts`) — testes de integração existentes servem de referência, adicionar casos:**
+- `queueOpen` no retorno de `getQueueBoard` é `false` quando o toggle manual está `true` mas `isAnyBarberOnShiftNow` é `false` (fora do horário).
+- `joinQueue` rejeita com mensagem apropriada quando o horário efetivo está fechado, mesmo com toggle manual `true`.
+
+**Server Actions de `/admin/configuracoes` (`app/admin/configuracoes/actions.ts`, novo):**
+- Todas exigem `requireAdmin()` — sem sessão, a action retorna erro de autorização (mesmo padrão de `app/admin/fila/actions.ts`, não precisa reteste se o helper já é testado).
+- Desativar barbeiro/serviço é soft delete: `active=false`, nunca `DELETE` — cobrir com teste de que o registro continua existindo na tabela (ou, se mockado, que o insert/DELETE não é chamado).
+- Salvar horário de um barbeiro: apaga só as linhas daquele `barber_id`+`weekday` antes de inserir — não deve afetar `weekday`s não enviados nem outros barbeiros.
+
+**Verificação manual (não dá pra automatizar sem Supabase local):**
+- Rodar `npm run test` e `npm run lint` antes de considerar a fase pronta.
+- Fluxo manual no browser: editar nome da barbearia/hero em Identidade → ver refletido em `/`; desativar um barbeiro → ele some do `/agendar` mas aparece (marcado inativo) em Configurações; editar horário com intervalo de almoço → slot de agendamento não aparece durante o almoço; zerar o horário de todos os barbeiros num dia → fila mostra aviso de fechada automaticamente nesse dia mesmo com toggle manual "aberta".
 
 ## Próximos passos
 
-1. Aprovar seção 3.
-2. Escrever seção 4 (plano de testes).
-3. Fazer a auto-revisão do spec.
+1. ~~Aprovar seção 3.~~ ✅
+2. ~~Escrever seção 4 (plano de testes).~~ ✅
+3. ~~Fazer a auto-revisão do spec.~~ ✅ (corrigida contradição entre seção 3 e 4 sobre assinatura dos helpers de `business-hours.ts`)
 4. Usuário revisa o spec completo.
 5. Transição para `writing-plans`.
