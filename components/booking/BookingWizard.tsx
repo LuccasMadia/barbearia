@@ -28,6 +28,8 @@ export function BookingWizard({
   const [slots, setSlots] = useState<string[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const nameRef = useRef(name);
+  nameRef.current = name;
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<{
@@ -93,7 +95,7 @@ export function BookingWizard({
     if (phone.replace(/\D/g, "").length < 8) return;
     startTransition(async () => {
       const found = await lookupClientByPhone(phone);
-      if (found && !name) setName(found.name);
+      if (found && !nameRef.current) setName(found.name);
     });
   }
 

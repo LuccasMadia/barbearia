@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Tables } from "@/lib/database.types";
 import { joinQueue, lookupClientByPhone } from "@/app/fila/actions";
@@ -16,6 +16,8 @@ export function QueueJoinForm({
   const router = useRouter();
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
+  const nameRef = useRef(name);
+  nameRef.current = name;
   const [serviceId, setServiceId] = useState(services[0]?.id ?? "");
   const [barberId, setBarberId] = useState("any");
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,7 @@ export function QueueJoinForm({
     if (phone.replace(/\D/g, "").length < 8) return;
     startTransition(async () => {
       const found = await lookupClientByPhone(phone);
-      if (found && !name) setName(found.name);
+      if (found && !nameRef.current) setName(found.name);
     });
   }
 
