@@ -2,6 +2,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getQueueBoard } from "@/lib/queue-server";
 import { AutoRefresh } from "@/components/AutoRefresh";
 
+export const dynamic = "force-dynamic";
+
 export default async function FilaTvPage() {
   const board = await getQueueBoard(createAdminClient());
 
