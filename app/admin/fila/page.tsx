@@ -16,20 +16,26 @@ export default async function AdminFilaPage() {
           <h1 className="font-display text-2xl text-paper">Fila</h1>
           <p className="mt-1 text-sm text-paper-dim">Atendimento por ordem de chegada.</p>
         </div>
-        <form action={toggleQueueOpen.bind(null, !board.queueOpen)}>
+        <form action={toggleQueueOpen.bind(null, !board.queueOpenManual)}>
           <button
             type="submit"
             className={`rounded-sm border px-3 py-2 text-sm transition-colors ${
-              board.queueOpen
+              board.queueOpenManual
                 ? "border-gold text-gold"
                 : "border-ink-line text-paper-dim hover:text-paper"
             }`}
           >
-            {board.queueOpen ? "Fila aberta" : "Fila fechada"} · clique para{" "}
-            {board.queueOpen ? "fechar" : "abrir"}
+            {board.queueOpenManual ? "Fila aberta" : "Fila fechada"} · clique para{" "}
+            {board.queueOpenManual ? "fechar" : "abrir"}
           </button>
         </form>
       </div>
+
+      {board.queueOpenManual && !board.queueOpen && (
+        <p className="text-sm text-danger">
+          Fechada automaticamente — fora do horário de atendimento.
+        </p>
+      )}
 
       <QueueBoard board={board} />
 
