@@ -41,8 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# git worktrees
-.claude/worktrees/
+# Claude Code local tooling (agents, skills, worktrees, settings)
+.claude/
 
-# Claude Code local settings
-.claude/settings.local.json
+# Superpowers skill local state
+.superpowers/
