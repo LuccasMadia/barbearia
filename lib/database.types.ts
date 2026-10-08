@@ -407,7 +407,6 @@ export type Database = {
           instagram: string | null
           logo_url: string | null
           name: string
-          opening_hours: string | null
           phone: string | null
           primary_color: string
           queue_open: boolean
@@ -422,7 +421,6 @@ export type Database = {
           instagram?: string | null
           logo_url?: string | null
           name?: string
-          opening_hours?: string | null
           phone?: string | null
           primary_color?: string
           queue_open?: boolean
@@ -437,7 +435,6 @@ export type Database = {
           instagram?: string | null
           logo_url?: string | null
           name?: string
-          opening_hours?: string | null
           phone?: string | null
           primary_color?: string
           queue_open?: boolean

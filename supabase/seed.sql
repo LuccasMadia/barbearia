@@ -1,9 +1,8 @@
-insert into site_config (name, address, phone, opening_hours, about)
+insert into site_config (name, address, phone, about)
 values (
   'Minha Barbearia',
   'Rua Exemplo, 123 - Centro',
   '(11) 99999-9999',
-  'Seg a Sáb, 09:00 às 19:00',
   'Edite esta descrição no painel administrativo em Configurações.'
 );
 
