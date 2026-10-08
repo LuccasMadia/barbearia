@@ -12,6 +12,7 @@ const DEFAULT_SITE_CONFIG: Tables<"site_config"> = {
   instagram: null,
   opening_hours: null,
   about: null,
+  queue_open: false,
   created_at: new Date(0).toISOString(),
   updated_at: new Date(0).toISOString(),
 };

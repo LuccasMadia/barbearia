@@ -316,6 +316,61 @@ export type Database = {
         }
         Relationships: []
       }
+      queue_entries: {
+        Row: {
+          barber_id: string | null
+          client_id: string
+          created_at: string
+          finished_at: string | null
+          id: string
+          service_id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          barber_id?: string | null
+          client_id: string
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          service_id: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          barber_id?: string | null
+          client_id?: string
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          service_id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queue_entries_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barbers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "queue_entries_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "queue_entries_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       services: {
         Row: {
           active: boolean
@@ -355,6 +410,7 @@ export type Database = {
           opening_hours: string | null
           phone: string | null
           primary_color: string
+          queue_open: boolean
           updated_at: string
           whatsapp: string | null
         }
@@ -369,6 +425,7 @@ export type Database = {
           opening_hours?: string | null
           phone?: string | null
           primary_color?: string
+          queue_open?: boolean
           updated_at?: string
           whatsapp?: string | null
         }
@@ -383,6 +440,7 @@ export type Database = {
           opening_hours?: string | null
           phone?: string | null
           primary_color?: string
+          queue_open?: boolean
           updated_at?: string
           whatsapp?: string | null
         }
