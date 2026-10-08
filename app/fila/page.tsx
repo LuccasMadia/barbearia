@@ -4,6 +4,7 @@ import { getOpeningHoursSummary } from "@/lib/business-hours";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { QueueJoinForm } from "@/components/queue/QueueJoinForm";
 import { Header } from "@/components/site/Header";
+import { SiteNavBar } from "@/components/site/SiteNavBar";
 import { Footer } from "@/components/site/Footer";
 
 export default async function FilaPage() {
@@ -19,6 +20,7 @@ export default async function FilaPage() {
   return (
     <>
       <Header siteConfig={siteConfig} />
+      <SiteNavBar />
       <main className="flex-1">
         {board.queueOpen ? (
           <QueueJoinForm services={services} barbers={barbers} />

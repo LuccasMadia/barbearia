@@ -6,6 +6,7 @@ import {
 import { getOpeningHoursSummary } from "@/lib/business-hours";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Header } from "@/components/site/Header";
+import { SiteNavBar } from "@/components/site/SiteNavBar";
 import { Hero } from "@/components/site/Hero";
 import { ServicesSection } from "@/components/site/ServicesSection";
 import { BarbersSection } from "@/components/site/BarbersSection";
@@ -23,6 +24,7 @@ export default async function Home() {
   return (
     <>
       <Header siteConfig={siteConfig} />
+      <SiteNavBar />
       <main>
         <Hero siteConfig={siteConfig} openingHoursSummary={openingHoursSummary} />
         <ServicesSection services={services} />

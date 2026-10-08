@@ -26,6 +26,8 @@
   --destructive-foreground: var(--paper);
   --accent: var(--ink-raised);
   --accent-foreground: var(--gold-bright);
+  --muted: var(--ink-raised);
+  --muted-foreground: var(--paper-dim);
   --border: var(--ink-line);
   --input: var(--ink-line);
   --ring: var(--gold);
@@ -52,6 +54,8 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

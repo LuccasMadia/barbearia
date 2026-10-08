@@ -1,5 +1,6 @@
 import { getQueueStatusByPhone, leaveQueue } from "@/app/fila/actions";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { SiteNavBar } from "@/components/site/SiteNavBar";
 
 export default async function FilaStatusPage({
   searchParams,
@@ -11,6 +12,7 @@ export default async function FilaStatusPage({
   if (!phone) {
     return (
       <div className="mx-auto max-w-sm px-6 py-24 text-center">
+        <SiteNavBar />
         <h1 className="font-display text-2xl text-paper">Acompanhar fila</h1>
         <form method="get" className="mt-8 space-y-3">
           <input
@@ -36,6 +38,7 @@ export default async function FilaStatusPage({
   return (
     <div className="mx-auto max-w-sm px-6 py-24 text-center">
       <AutoRefresh intervalMs={4000} />
+      <SiteNavBar />
       <h1 className="font-display text-2xl text-paper">Acompanhar fila</h1>
 
       {status.state === "none" && (
