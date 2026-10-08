@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ConfiguracoesTabs } from "@/components/admin/configuracoes/ConfiguracoesTabs";
 import { IdentityPanel } from "@/components/admin/configuracoes/IdentityPanel";
 import { BarbersPanel } from "@/components/admin/configuracoes/BarbersPanel";
+import { ServicesPanel } from "@/components/admin/configuracoes/ServicesPanel";
 
 type Tab = "identidade" | "barbeiros" | "servicos" | "horarios";
 
@@ -40,7 +41,7 @@ export default async function ConfiguracoesPage({
 
       {tab === "identidade" && siteConfig && <IdentityPanel siteConfig={siteConfig} />}
       {tab === "barbeiros" && <BarbersPanel barbers={barbers ?? []} />}
-      {tab === "servicos" && <p className="text-sm text-paper-dim">{(services ?? []).length} serviço(s) — painel chega na Task 10.</p>}
+      {tab === "servicos" && <ServicesPanel services={services ?? []} />}
       {tab === "horarios" && <p className="text-sm text-paper-dim">{(schedules ?? []).length} linha(s) de horário — painel chega na Task 11.</p>}
     </div>
   );
