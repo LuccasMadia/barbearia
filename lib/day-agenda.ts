@@ -1,5 +1,5 @@
 export type AgendaStatus = "agendado" | "concluido" | "cancelado" | "faltou";
-export type AgendaOrigin = "online" | "avulso";
+export type AgendaOrigin = "online" | "avulso" | "fila";
 
 export type AgendaAppointment = {
   id: string;

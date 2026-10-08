@@ -17,9 +17,9 @@ export function AppointmentCard({ appointment }: { appointment: AgendaAppointmen
     <div className="rounded-sm border border-ink-line bg-ink-raised px-3 py-2.5 text-sm">
       <div className="flex items-center justify-between">
         <span className="text-paper">{formatTime(appointment.startsAt)}</span>
-        {appointment.origin === "avulso" && (
+        {appointment.origin !== "online" && (
           <span className="text-xs uppercase tracking-[0.1em] text-paper-dim">
-            Avulso
+            {appointment.origin === "avulso" ? "Avulso" : "Fila"}
           </span>
         )}
       </div>

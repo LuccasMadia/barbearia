@@ -298,6 +298,15 @@ export async function finishService(admin: AdminClient, entryId: string): Promis
   const now = new Date();
   const finishedAt = now > startedAt ? now : new Date(startedAt.getTime() + 1000);
 
+  const { data: claimed } = await admin
+    .from("queue_entries")
+    .update({ status: "concluido", finished_at: finishedAt.toISOString() })
+    .eq("id", entryId)
+    .eq("status", "em_atendimento")
+    .select("id");
+
+  if (!claimed || claimed.length === 0) return;
+
   const { error: appointmentError } = await admin.from("appointments").insert({
     client_id: entry.client_id,
     barber_id: entry.barber_id,
@@ -308,12 +317,12 @@ export async function finishService(admin: AdminClient, entryId: string): Promis
     origin: "fila",
   });
 
-  if (appointmentError) return;
-
-  await admin
-    .from("queue_entries")
-    .update({ status: "concluido", finished_at: finishedAt.toISOString() })
-    .eq("id", entryId);
+  if (appointmentError) {
+    await admin
+      .from("queue_entries")
+      .update({ status: "em_atendimento", finished_at: null })
+      .eq("id", entryId);
+  }
 }
 
 export async function removeFromQueue(admin: AdminClient, entryId: string): Promise<void> {
