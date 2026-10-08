@@ -38,6 +38,12 @@ export default async function AdminLayout({
           >
             Agenda
           </Link>
+          <Link
+            href="/admin/fila"
+            className="text-sm text-paper-dim transition-colors hover:text-paper"
+          >
+            Fila
+          </Link>
           <form action={signOut}>
             <button
               type="submit"
