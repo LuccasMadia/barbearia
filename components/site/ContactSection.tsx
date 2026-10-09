@@ -17,8 +17,11 @@ export function ContactSection({
   if (!hasContact) return null;
 
   return (
-    <section id="contato" className="border-b border-ink-line">
-      <div className="mx-auto grid max-w-4xl gap-12 px-6 py-24 sm:grid-cols-2">
+    <section
+      id="contato"
+      className="flex min-h-screen items-center border-b border-ink-line"
+    >
+      <div className="mx-auto grid w-full max-w-4xl gap-12 px-6 py-24 sm:grid-cols-2">
         <div>
           <h2 className="font-display text-3xl text-paper sm:text-4xl">
             Contato

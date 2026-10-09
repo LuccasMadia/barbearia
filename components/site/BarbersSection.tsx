@@ -18,8 +18,11 @@ export function BarbersSection({
   if (barbers.length === 0) return null;
 
   return (
-    <section id="barbeiros" className="border-b border-ink-line bg-ink-raised">
-      <div className="mx-auto max-w-4xl px-6 py-24">
+    <section
+      id="barbeiros"
+      className="flex min-h-screen items-center border-b border-ink-line bg-ink-raised"
+    >
+      <div className="mx-auto w-full max-w-4xl px-6 py-24">
         <h2 className="font-display text-3xl text-paper sm:text-4xl">
           Barbeiros
         </h2>

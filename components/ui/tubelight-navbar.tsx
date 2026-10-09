@@ -37,18 +37,31 @@ export function NavBar({ items, className }: NavBarProps) {
 
     if (sections.length === 0) return
 
+    // The observer callback only receives entries whose intersection status
+    // changed since the last call, not every observed element's current
+    // state — at a section boundary the outgoing section's entry can arrive
+    // alone, momentarily losing track of the incoming section. Keep a
+    // cumulative ratio per section so the active tab is always picked from
+    // the full picture, not just the latest batch.
+    const ratios = new Map<Element, number>()
+
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-
-        if (!visible) {
-          setActiveOverride(null)
-          return
+        for (const entry of entries) {
+          ratios.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0)
         }
-        const match = sections.find((section) => section.el === visible.target)
-        if (match) setActiveOverride(match.name)
+
+        let visible: { name: string; el: HTMLElement } | null = null
+        let bestRatio = 0
+        for (const section of sections) {
+          const ratio = ratios.get(section.el) ?? 0
+          if (ratio > bestRatio) {
+            bestRatio = ratio
+            visible = section
+          }
+        }
+
+        setActiveOverride(visible?.name ?? null)
       },
       { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     )
@@ -104,7 +117,7 @@ export function NavBar({ items, className }: NavBarProps) {
                       instead of letting them simply translate with it. */}
                   <motion.div
                     layout
-                    className="absolute -top-2 left-1/2 h-1 w-8 -translate-x-1/2 rounded-t-full bg-primary"
+                    className="absolute -top-2 inset-x-0 mx-auto h-1 w-8 rounded-t-full bg-primary"
                   >
                     <motion.div layout className="absolute -left-2 -top-2 h-6 w-12 rounded-full bg-primary/20 blur-md" />
                     <motion.div layout className="absolute -top-1 h-6 w-8 rounded-full bg-primary/20 blur-md" />

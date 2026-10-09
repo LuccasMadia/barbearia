@@ -9,8 +9,11 @@ export function ServicesSection({
   if (services.length === 0) return null;
 
   return (
-    <section id="servicos" className="border-b border-ink-line">
-      <div className="mx-auto max-w-4xl px-6 py-24">
+    <section
+      id="servicos"
+      className="flex min-h-screen items-center border-b border-ink-line"
+    >
+      <div className="mx-auto w-full max-w-4xl px-6 py-24">
         <h2 className="font-display text-3xl text-paper sm:text-4xl">
           Serviços
         </h2>
