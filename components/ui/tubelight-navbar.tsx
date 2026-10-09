@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -25,6 +25,14 @@ export function NavBar({ items, className }: NavBarProps) {
   // view. Resets naturally on a real page navigation, since each page
   // mounts its own NavBar instance.
   const [activeOverride, setActiveOverride] = useState<string | null>(null)
+  // Set on click, cleared once the click's own scroll has had time to
+  // settle. While true, the observer below ignores whatever section it
+  // still sees as intersecting — at click time the page hasn't scrolled
+  // yet, so the PREVIOUS section is technically still visible and would
+  // otherwise immediately stomp the click back to where the user came
+  // from (most visibly when clicking a route-only item like "Início",
+  // which has no section of its own to later reassert the override).
+  const suppressObserverUntilRef = useRef(0)
 
   useEffect(() => {
     const sections = items
@@ -61,6 +69,8 @@ export function NavBar({ items, className }: NavBarProps) {
           }
         }
 
+        if (Date.now() < suppressObserverUntilRef.current) return
+
         // Only move the tab to a section that's actually visible. Dropping
         // to null here would fight a just-clicked tab while the smooth
         // scroll to its section is still in transit and nothing is yet in
@@ -94,7 +104,10 @@ export function NavBar({ items, className }: NavBarProps) {
             <Link
               key={item.name}
               href={item.url}
-              onClick={() => setActiveOverride(item.name)}
+              onClick={() => {
+                suppressObserverUntilRef.current = Date.now() + 1000
+                setActiveOverride(item.name)
+              }}
               className={cn(
                 "relative cursor-pointer rounded-sm px-5 py-2 text-sm font-semibold transition-colors",
                 "text-foreground/70 hover:text-primary",
