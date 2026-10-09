@@ -84,7 +84,13 @@ export function NavBar({ items, className }: NavBarProps) {
     return () => observer.disconnect()
   }, [items])
 
-  const routeItem = items.find((item) => !item.url.includes("#") && item.url === pathname)
+  // Longest-prefix match so a nested route (e.g. "/admin/agenda/2026-10-09")
+  // still highlights its section tab ("/admin/agenda") instead of falling
+  // through to the first item.
+  const routeItem = items
+    .filter((item) => !item.url.includes("#"))
+    .filter((item) => pathname === item.url || pathname.startsWith(`${item.url}/`))
+    .sort((a, b) => b.url.length - a.url.length)[0]
   const activeTab = activeOverride ?? routeItem?.name ?? items[0].name
 
   return (

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
 import { ScissorsMark } from "@/components/site/ScissorsMark";
+import { AdminNavBar } from "@/components/admin/AdminNavBar";
 
 export default async function AdminLayout({
   children,
@@ -25,42 +25,17 @@ export default async function AdminLayout({
           <ScissorsMark className="h-5 w-5 text-gold" />
           Painel administrativo
         </span>
-        <nav className="flex items-center gap-6">
-          <Link
-            href="/admin"
+        <form action={signOut}>
+          <button
+            type="submit"
             className="text-sm text-paper-dim transition-colors hover:text-paper"
           >
-            Dashboard
-          </Link>
-          <Link
-            href="/admin/agenda"
-            className="text-sm text-paper-dim transition-colors hover:text-paper"
-          >
-            Agenda
-          </Link>
-          <Link
-            href="/admin/fila"
-            className="text-sm text-paper-dim transition-colors hover:text-paper"
-          >
-            Fila
-          </Link>
-          <Link
-            href="/admin/configuracoes"
-            className="text-sm text-paper-dim transition-colors hover:text-paper"
-          >
-            Configurações
-          </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="text-sm text-paper-dim transition-colors hover:text-paper"
-            >
-              Sair
-            </button>
-          </form>
-        </nav>
+            Sair
+          </button>
+        </form>
       </header>
-      <main className="p-6">{children}</main>
+      <AdminNavBar />
+      <main className="p-6 pb-28 sm:pb-6">{children}</main>
     </div>
   );
 }
