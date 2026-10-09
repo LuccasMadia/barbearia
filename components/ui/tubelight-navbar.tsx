@@ -61,7 +61,12 @@ export function NavBar({ items, className }: NavBarProps) {
           }
         }
 
-        setActiveOverride(visible?.name ?? null)
+        // Only move the tab to a section that's actually visible. Dropping
+        // to null here would fight a just-clicked tab while the smooth
+        // scroll to its section is still in transit and nothing is yet in
+        // the center band, snapping the lamp back and forth instead of
+        // sliding straight to where the user clicked.
+        if (visible) setActiveOverride(visible.name)
       },
       { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     )
