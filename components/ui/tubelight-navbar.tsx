@@ -69,14 +69,13 @@ export function NavBar({ items, className }: NavBarProps) {
           }
         }
 
+        // During the post-click suppression window, skip entirely — both a
+        // match and a null here would fight a just-clicked tab before its
+        // own scroll has landed. Outside that window, follow the viewport
+        // normally, including back to null (routed fallback) when nothing
+        // is visible, e.g. scrolled back up to the unobserved hero.
         if (Date.now() < suppressObserverUntilRef.current) return
-
-        // Only move the tab to a section that's actually visible. Dropping
-        // to null here would fight a just-clicked tab while the smooth
-        // scroll to its section is still in transit and nothing is yet in
-        // the center band, snapping the lamp back and forth instead of
-        // sliding straight to where the user clicked.
-        if (visible) setActiveOverride(visible.name)
+        setActiveOverride(visible?.name ?? null)
       },
       { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     )
