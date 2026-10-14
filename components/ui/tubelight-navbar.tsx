@@ -109,9 +109,17 @@ export function NavBar({ items, className }: NavBarProps) {
             <Link
               key={item.name}
               href={item.url}
-              onClick={() => {
+              onClick={(e) => {
                 suppressObserverUntilRef.current = Date.now() + 1000
                 setActiveOverride(item.name)
+                // Route-only item (no "#") pointing at the page we're already
+                // on: navigating to the same URL has no hash target, so the
+                // browser never scrolls. Do it ourselves, or the lamp moves
+                // to "Início" while the page stays put.
+                if (!item.url.includes("#") && item.url === pathname) {
+                  e.preventDefault()
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }
               }}
               className={cn(
                 "relative cursor-pointer rounded-sm px-5 py-2 text-sm font-semibold transition-colors",
