@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "Barbearia — Agende seu horário",
   description:
     "Agende seu horário online, sem complicação. Escolha o serviço, o profissional e o melhor horário em poucos cliques.",
+  // WebP isn't supported by the app/icon file convention, so the icon lives
+  // in public/ and is wired through metadata instead.
+  icons: { icon: "/icon.webp" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
